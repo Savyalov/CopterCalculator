@@ -13,5 +13,10 @@ struct PropellerCalculatorApp: App {
         WindowGroup {
             ContentView()
         }
+        .windowStyle(DefaultWindowStyle())
+        .windowToolbarStyle(UnifiedWindowToolbarStyle())
+        .commands {
+            SidebarCommands()
+        }
     }
 }
