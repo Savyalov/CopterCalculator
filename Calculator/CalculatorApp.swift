@@ -1,6 +1,6 @@
 //
-//  PropellerCalculatorApp.swift
-//  PropellerCalculator
+//  CalculatorApp.swift
+//  Calculator
 //
 //  Created by Константин Савялов on 14.11.2025.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct PropellerCalculatorApp: App {
+struct CalculatorApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

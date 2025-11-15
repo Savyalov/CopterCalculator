@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		4861072B2EC6A2D7007F022B /* PropellerCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PropellerCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4861072B2EC6A2D7007F022B /* Calculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Calculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		4861072D2EC6A2D7007F022B /* PropellerCalculator */ = {
+		4861072D2EC6A2D7007F022B /* Calculator */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = PropellerCalculator;
+			path = Calculator;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -32,7 +32,7 @@
 		486107222EC6A2D7007F022B = {
 			isa = PBXGroup;
 			children = (
-				4861072D2EC6A2D7007F022B /* PropellerCalculator */,
+				4861072D2EC6A2D7007F022B /* Calculator */,
 				4861072C2EC6A2D7007F022B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -40,7 +40,7 @@
 		4861072C2EC6A2D7007F022B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4861072B2EC6A2D7007F022B /* PropellerCalculator.app */,
+				4861072B2EC6A2D7007F022B /* Calculator.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +48,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4861072A2EC6A2D7007F022B /* PropellerCalculator */ = {
+		4861072A2EC6A2D7007F022B /* Calculator */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 486107362EC6A2D8007F022B /* Build configuration list for PBXNativeTarget "PropellerCalculator" */;
+			buildConfigurationList = 486107362EC6A2D8007F022B /* Build configuration list for PBXNativeTarget "Calculator" */;
 			buildPhases = (
 				486107272EC6A2D7007F022B /* Sources */,
 				486107282EC6A2D7007F022B /* Frameworks */,
@@ -61,13 +61,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				4861072D2EC6A2D7007F022B /* PropellerCalculator */,
+				4861072D2EC6A2D7007F022B /* Calculator */,
 			);
-			name = PropellerCalculator;
+			name = Calculator;
 			packageProductDependencies = (
 			);
 			productName = PropellerCalculator;
-			productReference = 4861072B2EC6A2D7007F022B /* PropellerCalculator.app */;
+			productReference = 4861072B2EC6A2D7007F022B /* Calculator.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -85,7 +85,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 486107262EC6A2D7007F022B /* Build configuration list for PBXProject "PropellerCalculator" */;
+			buildConfigurationList = 486107262EC6A2D7007F022B /* Build configuration list for PBXProject "Calculator" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -99,7 +99,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4861072A2EC6A2D7007F022B /* PropellerCalculator */,
+				4861072A2EC6A2D7007F022B /* Calculator */,
 			);
 		};
 /* End PBXProject section */
@@ -312,7 +312,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		486107262EC6A2D7007F022B /* Build configuration list for PBXProject "PropellerCalculator" */ = {
+		486107262EC6A2D7007F022B /* Build configuration list for PBXProject "Calculator" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				486107342EC6A2D8007F022B /* Debug */,
@@ -321,7 +321,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		486107362EC6A2D8007F022B /* Build configuration list for PBXNativeTarget "PropellerCalculator" */ = {
+		486107362EC6A2D8007F022B /* Build configuration list for PBXNativeTarget "Calculator" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				486107372EC6A2D8007F022B /* Debug */,
