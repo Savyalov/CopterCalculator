@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-
-import SwiftUI
 import UniformTypeIdentifiers
 
 // MARK: - Главное представление
@@ -97,7 +95,7 @@ struct ParameterRow: View {
     }
 }
 
-// MARK: - Выбор профиля
+/// MARK: - Выбор профиля (простая версия)
 struct ProfileSelectionView: View {
     @ObservedObject var model: PropellerModel
     
@@ -115,22 +113,20 @@ struct ProfileSelectionView: View {
             .pickerStyle(MenuPickerStyle())
             .labelsHidden()
             
-            if let profile = BladeProfile.database.first(where: { $0.id == model.selectedProfile.id }) {
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack {
-                        Image(systemName: "chart.line.uptrend.xyaxis")
-                        Text("Эффективность: \(profile.efficiencyRange.lowerBound * 100, specifier: "%.0f")-\(profile.efficiencyRange.upperBound * 100, specifier: "%.0f")%")
-                    }
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    
-                    HStack(alignment: .top) {
-                        Image(systemName: "lightbulb")
-                        Text("Рекомендации: \(profile.recommendedApplications.joined(separator: ", "))")
-                    }
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                    Text("Эффективность: \(model.selectedProfile.efficiencyRange.lowerBound * 100, specifier: "%.0f")-\(model.selectedProfile.efficiencyRange.upperBound * 100, specifier: "%.0f")%")
                 }
+                .font(.caption)
+                .foregroundColor(.secondary)
+                
+                HStack(alignment: .top) {
+                    Image(systemName: "lightbulb")
+                    Text("Рекомендации: \(model.selectedProfile.recommendedApplications.joined(separator: ", "))")
+                }
+                .font(.caption)
+                .foregroundColor(.secondary)
             }
         }
         .padding()
@@ -219,7 +215,7 @@ struct ConfigurationView: View {
                 
                 Spacer()
                 
-                Text("Версия 2.0")
+                Text("Версия 2.1")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -259,29 +255,53 @@ struct ResultsView: View {
                 }
                 
                 // Результаты расчета
-                LazyVGrid(columns: [
-                    GridItem(.flexible()),
-                    GridItem(.flexible())
-                ], spacing: 16) {
-                    ResultCard(title: "Мощность", value: model.power, unit: "Вт", specifier: "%.2f")
-                    ResultCard(title: "Крутящий момент", value: model.torque, unit: "Н·м", specifier: "%.4f")
-                    ResultCard(title: "КПД", value: model.efficiency * 100, unit: "%", specifier: "%.1f")
-                    ResultCard(title: "Шаг винта", value: model.pitch, unit: "м", specifier: "%.3f")
-                    ResultCard(title: "Окружная скорость", value: model.tipSpeed, unit: "м/с", specifier: "%.1f")
-                    ResultCard(title: "Число Маха", value: model.tipSpeedMach, unit: "", specifier: "%.3f")
-                }
-                .padding(.horizontal)
+                ResultsGridView(model: model)
                 
                 // Предупреждения
-                if model.tipSpeedMach > 0.7 {
-                    WarningView(message: "Внимание: Окружная скорость приближается к звуковой!")
-                }
-                
-                if model.efficiency > 0.85 {
-                    WarningView(message: "Высокий КПД - проверьте корректность входных параметров", isWarning: false)
-                }
+                WarningsView(model: model)
             }
             .padding()
+        }
+    }
+}
+
+// MARK: - Сетка результатов
+struct ResultsGridView: View {
+    @ObservedObject var model: PropellerModel
+    
+    var body: some View {
+        LazyVGrid(columns: [
+            GridItem(.flexible()),
+            GridItem(.flexible())
+        ], spacing: 16) {
+            ResultCard(title: "Мощность", value: model.power, unit: "Вт", specifier: "%.2f")
+            ResultCard(title: "Крутящий момент", value: model.torque, unit: "Н·м", specifier: "%.4f")
+            ResultCard(title: "КПД", value: model.efficiency * 100, unit: "%", specifier: "%.1f")
+            ResultCard(title: "Шаг винта", value: model.pitch, unit: "м", specifier: "%.3f")
+            ResultCard(title: "Окружная скорость", value: model.tipSpeed, unit: "м/с", specifier: "%.1f")
+            ResultCard(title: "Число Маха", value: model.tipSpeedMach, unit: "", specifier: "%.3f")
+        }
+        .padding(.horizontal)
+    }
+}
+
+// MARK: - Предупреждения
+struct WarningsView: View {
+    @ObservedObject var model: PropellerModel
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            if model.tipSpeedMach > 0.7 {
+                WarningView(message: "Внимание: Окружная скорость приближается к звуковой!")
+            }
+            
+            if model.efficiency > 0.85 {
+                WarningView(message: "Высокий КПД - проверьте корректность входных параметров", isWarning: false)
+            }
+            
+            if model.power > 10000 {
+                WarningView(message: "Высокая мощность - требуется проверка системы охлаждения")
+            }
         }
     }
 }
@@ -370,33 +390,42 @@ struct PropellerView: View {
                 PropellerShape(
                     points: model.bladePoints,
                     blades: Int(model.blades) ?? 2,
-                    rotationAngle: model.rotationAngle,
-                    isAnimating: model.isAnimating
+                    rotationAngle: model.rotationAngle
                 )
                 
                 // Статичные элементы
                 PropellerStaticElements(
-                    diameter: Double(model.diameter) ?? 0.2
+                    diameter: Double(model.diameter) ?? 0.2,
+                    bladeSections: model.bladeSections
                 )
             }
             .frame(width: 400, height: 300)
             
             // Индикатор скорости
-            if model.isAnimating {
-                HStack {
-                    Image(systemName: "gauge")
-                    Text("\(model.rpm) об/мин")
-                    Text("•")
-                    Text("\(model.tipSpeed, specifier: "%.0f") м/с")
-                    Text("•")
-                    Text("Маха: \(model.tipSpeedMach, specifier: "%.2f")")
-                }
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .padding(.top, 8)
-            }
+            SpeedIndicatorView(model: model)
         }
         .padding()
+    }
+}
+
+// MARK: - Индикатор скорости
+struct SpeedIndicatorView: View {
+    @ObservedObject var model: PropellerModel
+    
+    var body: some View {
+        if model.isAnimating {
+            HStack {
+                Image(systemName: "gauge")
+                Text("\(model.rpm) об/мин")
+                Text("•")
+                Text("\(model.tipSpeed, specifier: "%.0f") м/с")
+                Text("•")
+                Text("Маха: \(model.tipSpeedMach, specifier: "%.2f")")
+            }
+            .font(.caption)
+            .foregroundColor(.secondary)
+            .padding(.top, 8)
+        }
     }
 }
 
@@ -404,7 +433,6 @@ struct PropellerShape: View {
     let points: [CGPoint]
     let blades: Int
     let rotationAngle: Double
-    let isAnimating: Bool
     
     var body: some View {
         GeometryReader { geometry in
@@ -415,7 +443,6 @@ struct PropellerShape: View {
                     .fill(bladeColor(for: bladeIndex))
                     .rotationEffect(.degrees(rotationAngle + Double(bladeIndex) * (360.0 / Double(blades))))
                     .position(center)
-                    .animation(isAnimating ? .linear(duration: 0.1).repeatForever(autoreverses: false) : .default, value: rotationAngle)
             }
         }
     }
@@ -423,35 +450,6 @@ struct PropellerShape: View {
     private func bladeColor(for index: Int) -> Color {
         let colors: [Color] = [.orange, .blue, .green, .purple, .red, .teal]
         return colors[index % colors.count].opacity(0.7)
-    }
-}
-
-struct PropellerStaticElements: View {
-    let diameter: Double
-    
-    var body: some View {
-        GeometryReader { geometry in
-            let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
-            let radius = min(geometry.size.width, geometry.size.height) * 0.4
-            
-            // Ось вращения
-            Circle()
-                .fill(Color.black)
-                .frame(width: 12, height: 12)
-                .position(center)
-            
-            // Окружность диаметра
-            Circle()
-                .stroke(Color.red, style: StrokeStyle(lineWidth: 1, dash: [5]))
-                .frame(width: radius * 2, height: radius * 2)
-                .position(center)
-            
-            // Подписи
-            Text("D = \(diameter, specifier: "%.3f") м")
-                .position(x: center.x + radius + 40, y: center.y)
-                .font(.caption)
-                .foregroundColor(.red)
-        }
     }
 }
 
@@ -479,6 +477,47 @@ struct BladeShape: Shape {
         
         path.closeSubpath()
         return path
+    }
+}
+
+struct PropellerStaticElements: View {
+    let diameter: Double
+    let bladeSections: [PropellerModel.BladeSection]
+    
+    var body: some View {
+        GeometryReader { geometry in
+            let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
+            let radius = min(geometry.size.width, geometry.size.height) * 0.4
+            
+            // Ось вращения
+            Circle()
+                .fill(Color.black)
+                .frame(width: 12, height: 12)
+                .position(center)
+            
+            // Окружность диаметра
+            Circle()
+                .stroke(Color.red, style: StrokeStyle(lineWidth: 1, dash: [5]))
+                .frame(width: radius * 2, height: radius * 2)
+                .position(center)
+            
+            // Секции лопасти для анализа
+            ForEach(bladeSections.indices.prefix(3), id: \.self) { index in
+                let section = bladeSections[index]
+                let sectionRadius = (section.radius / (diameter / 2)) * radius
+                
+                Circle()
+                    .stroke(Color.green.opacity(0.3), lineWidth: 1)
+                    .frame(width: sectionRadius * 2, height: sectionRadius * 2)
+                    .position(center)
+            }
+            
+            // Подписи
+            Text("D = \(diameter, specifier: "%.3f") м")
+                .position(x: center.x + radius + 40, y: center.y)
+                .font(.caption)
+                .foregroundColor(.red)
+        }
     }
 }
 

@@ -98,28 +98,19 @@ struct BladeProfile: Identifiable, Codable, Equatable, Hashable {
             recommendedApplications: ["Учебные модели", "Прототипы"]
         )
     ]
-    
-    // Реализация Hashable через id
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-    
-    static func == (lhs: BladeProfile, rhs: BladeProfile) -> Bool {
-        lhs.id == rhs.id
-    }
 }
 
 // MARK: - Основная модель расчета
 class PropellerModel: ObservableObject {
     
     // MARK: - Входные параметры
-    @Published var thrust: String = "1.0" { didSet { calculate() } }
-    @Published var diameter: String = "0.2" { didSet { calculate() } }
-    @Published var velocity: String = "0.0" { didSet { calculate() } }
-    @Published var rpm: String = "10000" { didSet { calculate() } }
-    @Published var blades: String = "2" { didSet { calculate() } }
-    @Published var density: String = "1.225" { didSet { calculate() } }
-    @Published var selectedProfile: BladeProfile = BladeProfile.database[0] { didSet { calculate() } }
+    @Published var thrust: String = "1.0"
+    @Published var diameter: String = "0.2"
+    @Published var velocity: String = "0.0"
+    @Published var rpm: String = "10000"
+    @Published var blades: String = "2"
+    @Published var density: String = "1.225"
+    @Published var selectedProfile: BladeProfile = BladeProfile.database[0]
     
     // MARK: - Расчетные параметры
     @Published var power: Double = 0.0
@@ -165,21 +156,18 @@ class PropellerModel: ObservableObject {
     
     // MARK: - Настройка подписок
     private func setupSubscriptions() {
-        // Комбинируем все параметры в группы
-        let flightParams = Publishers.CombineLatest3($thrust, $velocity, $density)
-        let geometryParams = Publishers.CombineLatest3($diameter, $blades, $rpm)
-        let profileParam = $selectedProfile
+        // Комбинируем параметры группами
+        let group1 = Publishers.CombineLatest3($thrust, $diameter, $velocity)
+        let group2 = Publishers.CombineLatest3($rpm, $blades, $density)
         
-        // Объединяем все группы
-        Publishers.CombineLatest3(flightParams, geometryParams, profileParam)
+        Publishers.CombineLatest3(group1, group2, $selectedProfile)
             .debounce(for: 0.5, scheduler: RunLoop.main)
-            .sink { [weak self] _ in
+            .sink { [weak self] (params1, params2, profile) in
                 self?.calculate()
             }
             .store(in: &cancellables)
     }
     
-    // MARK: - Основной расчет
     // MARK: - Основной расчет
     func calculate() {
         guard let T = Double(thrust),
@@ -195,9 +183,10 @@ class PropellerModel: ObservableObject {
         
         let R = D / 2.0
         let ω = (2.0 * Double.pi * N) / 60.0
+        let A = Double.pi * R * R
         
-        // Практический расчет для реалистичных результатов
-        let (power, torque, efficiency, pitch) = calculatePractical(
+        // Расчет по улучшенной методике
+        let (power, torque, efficiency, pitch) = calculateImprovedAerodynamics(
             thrust: T, diameter: D, velocity: V, rpm: N, blades: Int(B), density: ρ
         )
         
@@ -211,126 +200,106 @@ class PropellerModel: ObservableObject {
         generateBladeGeometry(radius: R, profile: selectedProfile)
         updateAnimationSpeed(rpm: N)
     }
-
-    // MARK: - Практический расчет
-    private func calculatePractical(thrust T: Double, diameter D: Double, velocity V: Double,
-                                  rpm N: Double, blades B: Int, density ρ: Double) -> (Double, Double, Double, Double) {
-        let R = D / 2.0
-        let ω = (2.0 * Double.pi * N) / 60.0
-        let A = Double.pi * R * R
-        
-        // Мощность на основе практических данных
-        let power = T * 800 + V * 50 // Практическая формула
-        
-        let torque = power / ω
-        let pitch = (V + 0.7 * sqrt(T / (2.0 * ρ * A))) / (N / 60.0)
-        
-        // КПД на основе профиля и условий
-        let baseEfficiency = selectedProfile.efficiencyRange.lowerBound + 0.2
-        let speedFactor = min(V / 20.0, 1.0)
-        let efficiency = baseEfficiency + speedFactor * 0.3
-        
-        return (power, torque, min(efficiency, 0.85), pitch)
-    }
     
-    // MARK: - Практический расчет для дронов
-    private func calculateAerodynamics(thrust T: Double, diameter D: Double, velocity V: Double,
-                                    rpm N: Double, blades B: Int, density ρ: Double) -> (Double, Double, Double, Double) {
+    // MARK: - Улучшенный аэродинамический расчет
+    private func calculateImprovedAerodynamics(thrust T: Double, diameter D: Double, velocity V: Double,
+                                             rpm N: Double, blades B: Int, density ρ: Double) -> (Double, Double, Double, Double) {
         let R = D / 2.0
         let ω = (2.0 * Double.pi * N) / 60.0
         let A = Double.pi * R * R
         
-        // Практические коэффициенты для дронов
-        let powerLoading = 0.15 // Вт/г для типичного дрона
-        let power = T * 1000 * powerLoading // Переводим кгс в граммы
-        
+        // Улучшенный расчет мощности
+        let power = calculateOptimizedPower(thrust: T, diameter: D, velocity: V, rpm: N, density: ρ)
         let torque = power / ω
-        let pitch = (V + 0.7 * sqrt(T / (2.0 * ρ * A))) / (N / 60.0)
         
-        // КПД рассчитываем на основе профиля и условий
-        var efficiency: Double
+        // Расчет шага винта
+        let pitch = calculateOptimizedPitch(thrust: T, diameter: D, velocity: V, rpm: N, density: ρ)
         
-        if V == 0 {
-            // Статический КПД (взлет)
-            efficiency = selectedProfile.efficiencyRange.lowerBound + 0.1
-        } else if V < 10 {
-            // Низкая скорость
-            efficiency = selectedProfile.efficiencyRange.lowerBound + 0.2
-        } else {
-            // Крейсерская скорость
-            efficiency = selectedProfile.efficiencyRange.upperBound - 0.1
-        }
-        
-        // Корректируем КПД в зависимости от числа лопастей
-        let bladeFactor = Double(B) / 2.0
-        efficiency *= (1.0 - (bladeFactor - 1.0) * 0.05)
+        // Расчет КПД с учетом профиля
+        let efficiency = calculateOptimizedEfficiency(thrust: T, velocity: V, power: power, profile: selectedProfile)
         
         return (power, torque, efficiency, pitch)
     }
     
-    private func calculateProfileCoefficients(profile: BladeProfile, radiusRatio: Double,
-                                           advanceRatio: Double, Reynolds: Double) -> (Cl: Double, Cd: Double) {
-        let reFactor = min(Reynolds / 1e5, 2.0)
+    private func calculateOptimizedPower(thrust T: Double, diameter D: Double, velocity V: Double,
+                                       rpm N: Double, density ρ: Double) -> Double {
+        let R = D / 2.0
+        let ω = (2.0 * Double.pi * N) / 60.0
+        let tipSpeed = ω * R
         
-        switch profile.type {
-        case .flatPlate:
-            return (1.2 * reFactor, 0.1)
-        case .clarkY:
-            return (1.4 - radiusRatio * 0.4, 0.08 - radiusRatio * 0.03)
-        case .naca0012:
-            return (1.3 - radiusRatio * 0.3, 0.06 - radiusRatio * 0.02)
-        case .naca4412:
-            return (1.5 - radiusRatio * 0.5, 0.07 - radiusRatio * 0.025)
-        case .eppler:
-            return (1.6 - radiusRatio * 0.6, 0.05 - radiusRatio * 0.015)
-        case .custom:
-            return (1.4 - radiusRatio * 0.4, 0.08 - radiusRatio * 0.03)
+        if V == 0 {
+            // Статический режим (взлет)
+            let idealPower = T * sqrt(T / (2.0 * ρ * Double.pi * R * R))
+            let figureOfMerit = selectedProfile.efficiencyRange.upperBound * 0.9
+            return idealPower / figureOfMerit
+        } else {
+            // Динамический режим
+            let advanceRatio = V / tipSpeed
+            let profileEfficiency = selectedProfile.efficiencyRange.lowerBound + (selectedProfile.efficiencyRange.upperBound - selectedProfile.efficiencyRange.lowerBound) * (1.0 - advanceRatio)
+            return (T * V) / profileEfficiency
         }
+    }
+    
+    private func calculateOptimizedPitch(thrust T: Double, diameter D: Double, velocity V: Double,
+                                       rpm N: Double, density ρ: Double) -> Double {
+        let R = D / 2.0
+        let A = Double.pi * R * R
+        
+        let inducedVelocity = 0.7 * sqrt(T / (2.0 * ρ * A))
+        let pitch = (V + inducedVelocity) / (N / 60.0)
+        
+        // Ограничиваем шаг разумными пределами
+        return min(max(pitch, D * 0.3), D * 1.5)
+    }
+    
+    private func calculateOptimizedEfficiency(thrust T: Double, velocity V: Double, power: Double, profile: BladeProfile) -> Double {
+        var efficiency: Double
+        
+        if V > 0 {
+            efficiency = (T * V) / max(power, 1e-10)
+        } else {
+            // При нулевой скорости используем характеристику профиля
+            efficiency = profile.efficiencyRange.lowerBound + 0.15
+        }
+        
+        // Ограничиваем КПД разумными пределами
+        return min(max(efficiency, 0.1), profile.efficiencyRange.upperBound)
     }
     
     // MARK: - Анимация
     func toggleAnimation() {
-            isAnimating.toggle()
-            
-            if isAnimating {
-                startContinuousAnimation()
-            } else {
-                stopAnimation()
-            }
-        }
+        isAnimating.toggle()
         
-        private func startContinuousAnimation() {
+        if isAnimating {
             let rpmValue = Double(rpm) ?? 10000
-            let duration = 60.0 / rpmValue // Время одного оборота в секундах
-            
-            withAnimation(.linear(duration: duration).repeatForever(autoreverses: false)) {
-                rotationAngle = 360
-            }
+            startAnimation(rpm: rpmValue)
+        } else {
+            stopAnimation()
         }
-        
-        private func stopAnimation() {
-            withAnimation(.easeOut) {
-                rotationAngle = 0
-            }
-        }
+    }
     
-    private func updateAnimationSpeed(rpm: Double) {
-        animationTimer?.invalidate()
-        
-        guard isAnimating else { return }
+    private func startAnimation(rpm: Double) {
+        stopAnimation()
         
         let rotationPerSecond = rpm / 60.0
-        let timeInterval = 0.016 // ~60 FPS
+        let timeInterval = 0.016
         let angleIncrement = rotationPerSecond * 360.0 * timeInterval
         
         animationTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { [weak self] _ in
             DispatchQueue.main.async {
-                self?.rotationAngle += angleIncrement
-                if self?.rotationAngle ?? 0 >= 360 {
-                    self?.rotationAngle = 0
+                guard let self = self else { return }
+                self.rotationAngle += angleIncrement
+                if self.rotationAngle >= 360 {
+                    self.rotationAngle -= 360
                 }
+                self.objectWillChange.send()
             }
         }
+    }
+    
+    private func stopAnimation() {
+        animationTimer?.invalidate()
+        animationTimer = nil
     }
     
     // MARK: - Экспорт в CSV
@@ -448,6 +417,13 @@ class PropellerModel: ObservableObject {
         bladeSections = []
     }
     
+    private func updateAnimationSpeed(rpm: Double) {
+        if isAnimating {
+            stopAnimation()
+            startAnimation(rpm: rpm)
+        }
+    }
+    
     private func generateBladeGeometry(radius: Double, profile: BladeProfile) {
         var points: [CGPoint] = []
         let steps = profile.chordDistribution.count
@@ -473,5 +449,20 @@ class PropellerModel: ObservableObject {
         }
         
         bladePoints = points
+        
+        // Генерируем сечения для отображения
+        bladeSections = (0..<min(6, steps)).map { i in
+            let r = Double(i) / Double(steps) * radius
+            let chord = profile.chordDistribution[i] * radius
+            let twist = profile.twistDistribution[i]
+            
+            return BladeSection(
+                radius: r,
+                chord: chord,
+                twist: twist,
+                liftCoefficient: 1.3 - Double(i) * 0.15,
+                dragCoefficient: 0.06 - Double(i) * 0.008
+            )
+        }
     }
 }
