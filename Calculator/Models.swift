@@ -183,7 +183,6 @@ class PropellerModel: ObservableObject {
         
         let R = D / 2.0
         let ω = (2.0 * Double.pi * N) / 60.0
-        let A = Double.pi * R * R
         
         // Расчет по улучшенной методике
         let (power, torque, efficiency, pitch) = calculateImprovedAerodynamics(
@@ -204,9 +203,7 @@ class PropellerModel: ObservableObject {
     // MARK: - Улучшенный аэродинамический расчет
     private func calculateImprovedAerodynamics(thrust T: Double, diameter D: Double, velocity V: Double,
                                              rpm N: Double, blades B: Int, density ρ: Double) -> (Double, Double, Double, Double) {
-        let R = D / 2.0
         let ω = (2.0 * Double.pi * N) / 60.0
-        let A = Double.pi * R * R
         
         // Улучшенный расчет мощности
         let power = calculateOptimizedPower(thrust: T, diameter: D, velocity: V, rpm: N, density: ρ)
