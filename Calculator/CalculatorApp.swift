@@ -11,7 +11,7 @@ import SwiftUI
 struct PropellerCalculatorApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SidebarMenu()
         }
         .windowStyle(DefaultWindowStyle())
         .windowToolbarStyle(UnifiedWindowToolbarStyle())

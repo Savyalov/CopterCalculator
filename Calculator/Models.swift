@@ -37,15 +37,19 @@ struct PropellerConfiguration: Codable, Identifiable {
     }
 }
 
-// MARK: - База данных профилей лопастей
+/// MARK: - База данных профилей лопастей с реальными параметрами
 struct BladeProfile: Identifiable, Codable, Equatable, Hashable {
     var id = UUID()
     var name: String
     var type: ProfileType
-    var chordDistribution: [Double]
-    var twistDistribution: [Double]
+    var chordDistribution: [Double]  // в метрах, абсолютные значения
+    var twistDistribution: [Double]  // в градусах
+    var thicknessDistribution: [Double] // толщина профиля в % хорды
     var efficiencyRange: ClosedRange<Double>
     var recommendedApplications: [String]
+    var materialThickness: Double // толщина материала в мм
+    var rootChord: Double { chordDistribution.first ?? 0 }
+    var tipChord: Double { chordDistribution.last ?? 0 }
     
     enum ProfileType: String, CaseIterable, Codable, Hashable {
         case flatPlate = "Плоская пластина"
@@ -58,44 +62,54 @@ struct BladeProfile: Identifiable, Codable, Equatable, Hashable {
     
     static let database: [BladeProfile] = [
         BladeProfile(
-            name: "Clark Y базовый",
+            name: "Clark Y для дрона 10\"",
             type: .clarkY,
-            chordDistribution: [0.15, 0.13, 0.11, 0.09, 0.07, 0.05],
-            twistDistribution: [45, 35, 25, 15, 8, 5],
-            efficiencyRange: 0.65...0.78,
-            recommendedApplications: ["Дроны", "Малые БПЛА"]
+            chordDistribution: [0.035, 0.032, 0.029, 0.026, 0.023, 0.020], // в метрах
+            twistDistribution: [28.0, 22.0, 16.0, 11.0, 7.0, 4.0], // в градусах
+            thicknessDistribution: [11.7, 10.8, 9.8, 8.7, 7.6, 6.5], // % хорды
+            efficiencyRange: 0.68...0.82,
+            recommendedApplications: ["Квадрокоптеры 8-12\"", "ФПВ дроны"],
+            materialThickness: 1.5 // мм
         ),
         BladeProfile(
-            name: "NACA 0012 симметричный",
+            name: "NACA 0012 для гоночного дрона",
             type: .naca0012,
-            chordDistribution: [0.12, 0.11, 0.10, 0.08, 0.06, 0.04],
-            twistDistribution: [40, 30, 20, 12, 6, 3],
-            efficiencyRange: 0.70...0.82,
-            recommendedApplications: ["Акробатические дроны", "Вертолеты"]
+            chordDistribution: [0.030, 0.028, 0.025, 0.022, 0.019, 0.016],
+            twistDistribution: [32.0, 25.0, 18.0, 12.0, 8.0, 5.0],
+            thicknessDistribution: [12.0, 11.2, 10.3, 9.2, 8.0, 6.8],
+            efficiencyRange: 0.65...0.78,
+            recommendedApplications: ["Гоночные дроны 5-7\"", "Акробатика"],
+            materialThickness: 1.2
         ),
         BladeProfile(
-            name: "NACA 4412 несимметричный",
+            name: "NACA 4412 для грузового дрона",
             type: .naca4412,
-            chordDistribution: [0.14, 0.12, 0.10, 0.08, 0.06, 0.04],
-            twistDistribution: [38, 28, 18, 10, 5, 2],
+            chordDistribution: [0.045, 0.041, 0.037, 0.033, 0.029, 0.025],
+            twistDistribution: [25.0, 19.0, 14.0, 10.0, 6.0, 3.0],
+            thicknessDistribution: [12.0, 11.0, 10.0, 9.0, 8.0, 7.0],
             efficiencyRange: 0.72...0.85,
-            recommendedApplications: ["Тяговые винты", "Грузовые дроны"]
+            recommendedApplications: ["Грузовые дроны", "Кинодроны"],
+            materialThickness: 2.0
         ),
         BladeProfile(
-            name: "Eppler 423 высокоэффективный",
+            name: "Eppler 423 для марафонского дрона",
             type: .eppler,
-            chordDistribution: [0.13, 0.115, 0.095, 0.075, 0.055, 0.035],
-            twistDistribution: [42, 32, 22, 13, 7, 4],
+            chordDistribution: [0.032, 0.030, 0.027, 0.024, 0.021, 0.018],
+            twistDistribution: [26.0, 20.0, 15.0, 10.0, 6.0, 3.0],
+            thicknessDistribution: [10.5, 9.8, 9.0, 8.1, 7.1, 6.0],
             efficiencyRange: 0.75...0.88,
-            recommendedApplications: ["Спортивные дроны", "Гоночные БПЛА"]
+            recommendedApplications: ["Марафонские дроны", "Долгий полет"],
+            materialThickness: 1.0
         ),
         BladeProfile(
-            name: "Плоская пластина",
+            name: "Плоская пластина для прототипа",
             type: .flatPlate,
-            chordDistribution: [0.16, 0.14, 0.12, 0.10, 0.08, 0.06],
-            twistDistribution: [48, 38, 28, 18, 10, 6],
+            chordDistribution: [0.040, 0.037, 0.034, 0.031, 0.028, 0.025],
+            twistDistribution: [35.0, 28.0, 21.0, 15.0, 10.0, 6.0],
+            thicknessDistribution: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
             efficiencyRange: 0.45...0.60,
-            recommendedApplications: ["Учебные модели", "Прототипы"]
+            recommendedApplications: ["Прототипы", "Обучение"],
+            materialThickness: 3.0
         )
     ]
 }

@@ -27,30 +27,8 @@ struct ContentView: View {
             // Основная область с результатами и графикой
             ResultsView(model: propellerModel)
         }
-        .navigationTitle("Расчет воздушного винта")
+        .navigationTitle("Конструктор лопасти")
         .frame(minWidth: 1200, minHeight: 800)
-    }
-}
-
-
-// MARK: - Индикатор скорости
-struct SpeedIndicatorView: View {
-    @ObservedObject var model: PropellerModel
-    
-    var body: some View {
-        if model.isAnimating {
-            HStack {
-                Image(systemName: "gauge")
-                Text("\(model.rpm) об/мин")
-                Text("•")
-                Text("\(model.tipSpeed, specifier: "%.0f") м/с")
-                Text("•")
-                Text("Маха: \(model.tipSpeedMach, specifier: "%.2f")")
-            }
-            .font(.caption)
-            .foregroundColor(.secondary)
-            .padding(.top, 8)
-        }
     }
 }
 
