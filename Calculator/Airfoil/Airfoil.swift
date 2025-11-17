@@ -95,9 +95,9 @@ struct BladeGeometry {
 struct DroneSpecs {
     let mass: Double
     let maxSpeed: Double
-    let numberOfBlades: Int
+    var numberOfBlades: Int
     let numberOfMotors: Int
-    let operatingAltitude: Double
+    var operatingAltitude: Double
 }
 
 struct BEMTResult {
@@ -805,4 +805,4 @@ func demonstrateAdvancedFeatures() {
 }
 
 // Запуск демонстрации
-demonstrateAdvancedFeatures()
+//demonstrateAdvancedFeatures()
