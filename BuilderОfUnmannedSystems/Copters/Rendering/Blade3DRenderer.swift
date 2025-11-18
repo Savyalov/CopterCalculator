@@ -10,39 +10,39 @@ import SceneKit
 import SwiftUI
 import Combine
 
-/// # 3D Blade Renderer
-/// Manages 3D visualization of propeller blades using SceneKit
-/// Provides high-quality rendering with realistic materials and lighting
+/// # 3D Визуализатор лопасти
+/// Управляет 3D визуализацией лопастей пропеллера с использованием SceneKit
+/// Обеспечивает высококачественную визуализацию с реалистичными материалами и освещением
 public class Blade3DRenderer: NSObject, ObservableObject {
     
-    // MARK: - Public Properties
+    // MARK: - Публичные свойства
     
-    /// ## Loading Status
-    /// Indicates whether the renderer is currently processing geometry
-    /// Used to show loading indicators in the UI
+    /// ## Статус загрузки
+    /// Указывает, обрабатывает ли в данный момент визуализатор геометрию
+    /// Используется для отображения индикаторов загрузки в пользовательском интерфейсе
     @Published public var isLoading = false
     
-    // MARK: - Private Properties
+    // MARK: - Приватные свойства
     
-    /// ## SceneKit Scene
-    /// Root scene containing all 3D objects and lighting
-    /// Manages the 3D environment and rendering pipeline
+    /// ## Сцена SceneKit
+    /// Корневая сцена, содержащая все 3D объекты и освещение
+    /// Управляет 3D окружением и конвейером визуализации
     private var scene: SCNScene
     
-    /// ## Camera Node
-    /// SceneKit camera for viewing the 3D scene
-    /// Controls viewpoint and projection parameters
+    /// ## Узел камеры
+    /// Камера SceneKit для просмотра 3D сцены
+    /// Управляет точкой обзора и параметрами проекции
     private var cameraNode: SCNNode
     
-    /// ## Blade Node
-    /// SceneKit node containing the blade geometry
-    /// Parent node for all blade visual components
+    /// ## Узел лопасти
+    /// Узел SceneKit, содержащий геометрию лопасти
+    /// Родительский узел для всех визуальных компонентов лопасти
     private var bladeNode: SCNNode?
     
-    // MARK: - Initialization
+    // MARK: - Инициализация
     
-    /// ## 3D Renderer Initializer
-    /// Sets up the SceneKit scene with default lighting and camera
+    /// ## Инициализатор 3D визуализатора
+    /// Настраивает сцену SceneKit с освещением и камерой по умолчанию
     public override init() {
         self.scene = SCNScene()
         self.cameraNode = SCNNode()
@@ -50,24 +50,24 @@ public class Blade3DRenderer: NSObject, ObservableObject {
         setupScene()
     }
     
-    // MARK: - Public Methods
+    // MARK: - Публичные методы
     
-    /// ## Render Blade Mesh
-    /// Converts blade mesh to SceneKit geometry and adds to scene
-    /// Applies materials and configures for high-quality rendering
-    /// - Parameter mesh: Blade mesh to render
-    /// - Returns: Configured SceneKit scene ready for display
+    /// ## Визуализировать сетку лопасти
+    /// Преобразует сетку лопасти в геометрию SceneKit и добавляет в сцену
+    /// Применяет материалы и настраивает для высококачественной визуализации
+    /// - Parameter mesh: Сетка лопасти для визуализации
+    /// - Returns: Настроенная сцена SceneKit, готовая к отображению
     public func renderBlade(mesh: BladeMesh) -> SCNScene {
         isLoading = true
         
-        // Remove previous blade geometry
+        // Удаляем предыдущую геометрию лопасти
         bladeNode?.removeFromParentNode()
         
-        // Create new blade geometry from mesh
+        // Создаем новую геометрию лопасти из сетки
         let bladeGeometry = createGeometry(from: mesh)
         bladeNode = SCNNode(geometry: bladeGeometry)
         
-        // Apply realistic material properties
+        // Применяем реалистичные свойства материала
         let material = SCNMaterial()
         material.diffuse.contents = NSColor.systemBlue
         material.specular.contents = NSColor.white
@@ -75,39 +75,39 @@ public class Blade3DRenderer: NSObject, ObservableObject {
         material.transparency = 0.9
         bladeGeometry.materials = [material]
         
-        // Add blade to scene
+        // Добавляем лопасть в сцену
         scene.rootNode.addChildNode(bladeNode!)
         
         isLoading = false
         return scene
     }
     
-    /// ## Update Camera Position
-    /// Moves the camera to a new position in 3D space
-    /// - Parameter position: New camera position as SIMD3<Float>
+    /// ## Обновить позицию камеры
+    /// Перемещает камеру в новую позицию в 3D пространстве
+    /// - Parameter position: Новая позиция камеры как SIMD3<Float>
     public func updateCamera(position: SIMD3<Float>) {
         cameraNode.position = SCNVector3(position.x, position.y, position.z)
     }
     
-    // MARK: - Private Methods
+    // MARK: - Приватные методы
     
-    /// ## Setup Scene Environment
-    /// Configures default lighting, camera, and scene properties
-    /// Creates a professional visualization environment
+    /// ## Настроить окружение сцены
+    /// Настраивает освещение по умолчанию, камеру и свойства сцены
+    /// Создает профессиональную среду визуализации
     private func setupScene() {
-        // Setup camera with default position
+        // Настраиваем камеру с позицией по умолчанию
         cameraNode.camera = SCNCamera()
         cameraNode.position = SCNVector3(0, 0, 15)
         scene.rootNode.addChildNode(cameraNode)
         
-        // Add ambient light for base illumination
+        // Добавляем окружающий свет для базового освещения
         let ambientLight = SCNNode()
         ambientLight.light = SCNLight()
         ambientLight.light!.type = .ambient
         ambientLight.light!.color = NSColor(white: 0.3, alpha: 1.0)
         scene.rootNode.addChildNode(ambientLight)
         
-        // Add directional light for highlights and shadows
+        // Добавляем направленный свет для бликов и теней
         let directionalLight = SCNNode()
         directionalLight.light = SCNLight()
         directionalLight.light!.type = .directional
@@ -117,27 +117,27 @@ public class Blade3DRenderer: NSObject, ObservableObject {
         scene.rootNode.addChildNode(directionalLight)
     }
     
-    /// ## Create SceneKit Geometry
-    /// Converts custom blade mesh to SceneKit geometry format
-    /// - Parameter mesh: Source blade mesh data
-    /// - Returns: SceneKit geometry ready for rendering
+    /// ## Создать геометрию SceneKit
+    /// Преобразует пользовательскую сетку лопасти в формат геометрии SceneKit
+    /// - Parameter mesh: Исходные данные сетки лопасти
+    /// - Returns: Геометрия SceneKit, готовая к визуализации
     private func createGeometry(from mesh: BladeMesh) -> SCNGeometry {
         var vertices: [SCNVector3] = []
         var indices: [Int32] = []
         
-        // Convert custom vertices to SceneKit format
+        // Преобразуем пользовательские вершины в формат SceneKit
         for vertex in mesh.vertices {
             vertices.append(SCNVector3(vertex.x, vertex.y, vertex.z))
         }
         
-        // Convert faces to triangle indices
+        // Преобразуем грани в индексы треугольников
         for face in mesh.faces {
             for vertexIndex in face {
                 indices.append(Int32(vertexIndex))
             }
         }
         
-        // Create SceneKit geometry sources
+        // Создаем источники геометрии SceneKit
         let vertexSource = SCNGeometrySource(vertices: vertices)
         let element = SCNGeometryElement(indices: indices, primitiveType: .triangles)
         

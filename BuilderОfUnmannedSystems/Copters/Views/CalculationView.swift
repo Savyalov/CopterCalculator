@@ -269,9 +269,16 @@ public struct ParameterField: View {
                 .foregroundColor(.secondary)
             
             HStack {
-                // Slider for coarse adjustment
-                Slider(value: $value, in: range, step: step)
-                    .accentColor(.accentColor)
+//                if #available(macOS 11.0, *) {
+//                    // Используем SwiftUI.Slider
+//                    Slider(value: $value, in: range, step: step)
+//                        .accentColor(.accentColor)
+//                } else {
+                    // Используем AppKitSlider
+                    AppKitSliderWithStep(value: $value, minValue: range.lowerBound, maxValue: range.upperBound, step: step)
+                        .frame(height: 20)
+               // }
+                    
                 
                 // Text field for precise input
                 TextField("", value: $value, formatter: NumberFormatter.decimalFormatter)
@@ -338,5 +345,53 @@ struct CalculationView_Previews: PreviewProvider {
         CalculationView()
             .environmentObject(CalculationViewModel())
             .environmentObject(BladeViewModel())
+    }
+}
+
+struct AppKitSliderWithStep: NSViewRepresentable {
+    typealias NSViewType = NSSlider
+    
+    @Binding var value: Double
+    let minValue: Double
+    let maxValue: Double
+    let step: Double
+    
+    func makeNSView(context: Context) -> NSSlider {
+        let slider = NSSlider()
+        slider.minValue = minValue
+        slider.maxValue = maxValue
+        slider.doubleValue = value
+        slider.target = context.coordinator
+        slider.action = #selector(Coordinator.valueChanged(_:))
+        
+        // Настраиваем количество "тиков" для имитации шага
+        let rangeWidth = maxValue - minValue
+        let numberOfTicks = Int(rangeWidth / step) + 1
+        slider.numberOfTickMarks = numberOfTicks
+        slider.allowsTickMarkValuesOnly = true
+        
+        return slider
+    }
+    
+    func updateNSView(_ nsView: NSSlider, context: Context) {
+        nsView.doubleValue = value
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject {
+        let parent: AppKitSliderWithStep
+        
+        init(_ parent: AppKitSliderWithStep) {
+            self.parent = parent
+        }
+        
+        @objc func valueChanged(_ sender: NSSlider) {
+            // Округляем до ближайшего шага
+            let steppedValue = (sender.doubleValue / parent.step).rounded() * parent.step
+            parent.value = steppedValue
+        }
     }
 }

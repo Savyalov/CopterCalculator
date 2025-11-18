@@ -7,39 +7,39 @@
 
 import Foundation
 
-/// # Blade Element Momentum Theory Calculator
-/// Advanced BEMT implementation for propeller performance prediction
-/// Combines blade element theory with momentum theory for accurate results
+/// # Калькулятор теории элемента лопасти и импульса
+/// Продвинутая реализация BEMT для прогнозирования производительности пропеллера
+/// Сочетает теорию элемента лопасти с теорией импульса для точных результатов
 public class BEMTCalculator {
     
-    // MARK: - Private Constants
+    // MARK: - Приватные константы
     
-    /// ## Convergence Tolerance
-    /// Numerical tolerance for iterative solution convergence
-    /// Smaller values increase accuracy but require more iterations
+    /// ## Допуск сходимости
+    /// Численный допуск для сходимости итерационного решения
+    /// Меньшие значения увеличивают точность, но требуют больше итераций
     private let epsilon: Double = 1e-8
     
-    /// ## Maximum Iterations
-    /// Safety limit for iterative solvers to prevent infinite loops
+    /// ## Максимальное количество итераций
+    /// Предохранительный предел для итерационных решателей для предотвращения бесконечных циклов
     private let maxIterations = 50
     
-    /// ## Atmosphere Model
-    /// Standard atmosphere model for altitude-dependent properties
+    /// ## Модель атмосферы
+    /// Модель стандартной атмосферы для свойств, зависящих от высоты
     private let atmosphereModel = StandardAtmosphere()
     
-    // MARK: - Public Methods
+    // MARK: - Публичные методы
     
-    /// ## Calculate Propeller Performance
-    /// Main entry point for propeller performance calculation using BEMT
-    /// Handles complete calculation pipeline from geometry to results
+    /// ## Рассчитать производительность пропеллера
+    /// Основная точка входа для расчета производительности пропеллера с использованием BEMT
+    /// Обрабатывает полный конвейер расчетов от геометрии до результатов
     /// - Parameters:
-    ///   - drone: Drone specifications
-    ///   - blade: Blade geometry definition
-    ///   - airfoil: Airfoil aerodynamic data
-    ///   - rpm: Rotational speed in RPM
-    ///   - flightSpeed: Forward flight speed in m/s (0 for hover)
-    ///   - includeElementData: Flag to include detailed element data
-    /// - Returns: Complete BEMT calculation results
+    ///   - drone: Характеристики дрона
+    ///   - blade: Определение геометрии лопасти
+    ///   - airfoil: Аэродинамические данные профиля
+    ///   - rpm: Скорость вращения в об/мин
+    ///   - flightSpeed: Скорость прямого полета в м/с (0 для зависания)
+    ///   - includeElementData: Флаг включения детальных данных по элементам
+    /// - Returns: Полные результаты расчета BEMT
     public func calculatePropeller(
         drone: DroneSpecs,
         blade: BladeGeometry,
@@ -49,17 +49,17 @@ public class BEMTCalculator {
         includeElementData: Bool = false
     ) -> BEMTResult {
         
-        // Calculate atmospheric conditions at operating altitude
+        // Вычисляем атмосферные условия на рабочей высоте
         let atmosphere = atmosphereModel.calculateConditions(altitude: drone.operatingAltitude)
         
-        // Convert RPM to angular velocity (rad/s)
+        // Преобразуем RPM в угловую скорость (рад/с)
         let omega = rpm * 2.0 * .pi / 60.0
         
-        // Discretize blade into elements for analysis
+        // Дискретизируем лопасть на элементы для анализа
         let numberOfElements = 30
         let dr = (blade.radius - blade.rootCutout) / Double(numberOfElements)
         
-        // Initialize result accumulators
+        // Инициализируем аккумуляторы результатов
         var totalThrust: Double = 0.0
         var totalTorque: Double = 0.0
         var maxResidual: Double = 0.0
@@ -68,7 +68,7 @@ public class BEMTCalculator {
         var elementIterations: [Int] = []
         var elementData: [BladeElementData] = []
         
-        // Process each blade element
+        // Обрабатываем каждый элемент лопасти
         for i in 0..<numberOfElements {
             let r = blade.rootCutout + Double(i) * dr + dr/2.0
             
@@ -83,19 +83,19 @@ public class BEMTCalculator {
                 atmosphere: atmosphere
             )
             
-            // Accumulate results
+            // Аккумулируем результаты
             totalThrust += elementResult.thrust
             totalTorque += elementResult.torque
             maxResidual = max(maxResidual, elementResult.residual)
             totalIterations += elementResult.iterations
             elementIterations.append(elementResult.iterations)
             
-            // Store convergence history from representative element
+            // Сохраняем историю сходимости от репрезентативного элемента
             if i == numberOfElements / 2 {
                 residualHistory = elementResult.residualHistory
             }
             
-            // Store detailed element data if requested
+            // Сохраняем детальные данные элемента если запрошено
             if includeElementData {
                 elementData.append(BladeElementData(
                     radius: r,
@@ -111,11 +111,11 @@ public class BEMTCalculator {
             }
         }
         
-        // Scale results for multiple motors and blades
+        // Масштабируем результаты для нескольких моторов и лопастей
         totalThrust *= Double(drone.numberOfMotors)
         totalTorque *= Double(drone.numberOfMotors)
         
-        // Calculate power and efficiency
+        // Вычисляем мощность и эффективность
         let power = totalTorque * omega
         let efficiency = calculateEfficiency(
             thrust: totalThrust,
@@ -125,7 +125,7 @@ public class BEMTCalculator {
             density: atmosphere.density
         )
         
-        // Return comprehensive results
+        // Возвращаем комплексные результаты
         return BEMTResult(
             thrust: totalThrust,
             torque: totalTorque,
@@ -142,21 +142,21 @@ public class BEMTCalculator {
         )
     }
     
-    // MARK: - Private Calculation Methods
+    // MARK: - Приватные методы расчетов
     
-    /// ## Calculate Single Blade Element
-    /// Performs BEMT analysis on a single radial element of the blade
-    /// Solves coupled equations using Newton-Raphson iteration
+    /// ## Рассчитать одиночный элемент лопасти
+    /// Выполняет анализ BEMT на одиночном радиальном элементе лопасти
+    /// Решает связанные уравнения с использованием итераций Ньютона-Рафсона
     /// - Parameters:
-    ///   - r: Radial position of element center
-    ///   - dr: Element radial width
-    ///   - blade: Blade geometry
-    ///   - airfoil: Airfoil data
-    ///   - omega: Angular velocity
-    ///   - flightSpeed: Forward speed
-    ///   - numberOfBlades: Number of blades
-    ///   - atmosphere: Atmospheric conditions
-    /// - Returns: Element performance and convergence data
+    ///   - r: Радиальная позиция центра элемента
+    ///   - dr: Радиальная ширина элемента
+    ///   - blade: Геометрия лопасти
+    ///   - airfoil: Данные профиля
+    ///   - omega: Угловая скорость
+    ///   - flightSpeed: Скорость полета вперед
+    ///   - numberOfBlades: Количество лопастей
+    ///   - atmosphere: Атмосферные условия
+    /// - Returns: Данные производительности и сходимости элемента
     private func calculateBladeElement(
         r: Double,
         dr: Double,
@@ -170,14 +170,14 @@ public class BEMTCalculator {
           residualHistory: [Double], alpha: Double, cl: Double, cd: Double,
           reynolds: Double, mach: Double) {
         
-        // Calculate improved initial guess for induced velocities
+        // Вычисляем улучшенное начальное приближение для индуцированных скоростей
         let (initialAxial, initialTangential) = calculateImprovedInitialGuess(
             r: r, R: blade.radius, omega: omega, flightSpeed: flightSpeed,
             numberOfBlades: numberOfBlades, chord: blade.chordDistribution(r / blade.radius),
             twist: blade.twistDistribution(r / blade.radius), density: atmosphere.density
         )
         
-        // Initialize iteration variables
+        // Инициализируем переменные итераций
         var axialInduced = initialAxial
         var tangentialInduced = initialTangential
         var residual = Double.greatestFiniteMagnitude
@@ -192,11 +192,11 @@ public class BEMTCalculator {
         var finalReynolds: Double = 0.0
         var finalMach: Double = 0.0
         
-        // Iterative solution loop
+        // Цикл итерационного решения
         while residual > epsilon && iterations < maxIterations {
             iterations += 1
             
-            // Perform Newton-Raphson iteration
+            // Выполняем итерацию Ньютона-Рафсона
             let (newAxial, newTangential, thrust, torque, alpha, cl, cd, reynolds, mach, currentResidual) = newtonRaphsonIteration(
                 r: r, dr: dr, blade: blade, airfoil: airfoil, omega: omega,
                 flightSpeed: flightSpeed, numberOfBlades: numberOfBlades,
@@ -204,22 +204,22 @@ public class BEMTCalculator {
                 currentAxial: axialInduced, currentTangential: tangentialInduced
             )
             
-            // Update convergence tracking
+            // Обновляем отслеживание сходимости
             residual = currentResidual
             residualHistory.append(residual)
             
-            // Apply adaptive relaxation for stability
+            // Применяем адаптивную релаксацию для стабильности
             let relaxation = calculateAdaptiveRelaxation(
                 iteration: iterations,
                 residual: residual,
                 residualHistory: residualHistory
             )
             
-            // Update induced velocities
+            // Обновляем индуцированные скорости
             axialInduced = axialInduced + relaxation * (newAxial - axialInduced)
             tangentialInduced = tangentialInduced + relaxation * (newTangential - tangentialInduced)
             
-            // Store current results
+            // Сохраняем текущие результаты
             finalThrust = thrust
             finalTorque = torque
             finalAlpha = alpha
@@ -228,7 +228,7 @@ public class BEMTCalculator {
             finalReynolds = reynolds
             finalMach = mach
             
-            // Check for divergence and apply fallback if needed
+            // Проверяем на расходимость и применяем резервный метод если нужно
             if iterations > 10 && residual > 1.0 {
                 return calculateBladeElementFallback(
                     r: r, dr: dr, blade: blade, airfoil: airfoil, omega: omega,
@@ -238,86 +238,91 @@ public class BEMTCalculator {
             }
         }
         
-        // Return final converged results
+        // Возвращаем финальные сходящиеся результаты
         return (finalThrust, finalTorque, residual, iterations, residualHistory,
                 finalAlpha, finalCl, finalCd, finalReynolds, finalMach)
     }
     
-    /// ## Improved Initial Guess Calculation
-    /// Provides intelligent starting values for induced velocities
-    /// Reduces iteration count and improves convergence stability
+    /// ## Расчет улучшенного начального приближения
+    /// Предоставляет интеллектуальные начальные значения для индуцированных скоростей
+    /// Уменьшает количество итераций и улучшает стабильность сходимости
     /// - Parameters:
-    ///   - r: Radial position
-    ///   - R: Blade radius
-    ///   - omega: Angular velocity
-    ///   - flightSpeed: Forward speed
-    ///   - numberOfBlades: Blade count
-    ///   - chord: Local chord length
-    ///   - twist: Local twist angle
-    ///   - density: Air density
-    /// - Returns: Initial guesses for axial and tangential induced velocities
+    ///   - r: Радиальная позиция
+    ///   - R: Радиус лопасти
+    ///   - omega: Угловая скорость
+    ///   - flightSpeed: Скорость полета вперед
+    ///   - numberOfBlades: Количество лопастей
+    ///   - chord: Локальная длина хорды
+    ///   - twist: Локальный угол крутки
+    ///   - density: Плотность воздуха
+    /// - Returns: Начальные приближения для осевой и тангенциальной индуцированных скоростей
     private func calculateImprovedInitialGuess(
         r: Double, R: Double, omega: Double, flightSpeed: Double,
         numberOfBlades: Int, chord: Double, twist: Double, density: Double
     ) -> (axial: Double, tangential: Double) {
         
         let tipSpeed = omega * R
-        let localSpeed = omega * r
+        let localSpeed = omega * r  // Локальная окружная скорость на радиусе r
         
         if flightSpeed == 0 {
-            // Hover regime - empirical formula based on vortex theory
+            // Режим зависания - эмпирическая формула на основе вихревой теории
             let solidity = (Double(numberOfBlades) * chord) / (2.0 * .pi * r)
-            let axialGuess = tipSpeed * 0.1 * (r/R)
             
-            // Account for solidity and twist effects
+            // Улучшенная оценка с использованием локальной скорости
+            let axialGuess = localSpeed * 0.15 * (r/R) * (1.0 + 0.1 * solidity)
+            
+            // Учитываем эффекты сплошности и крутки
             let twistEffect = max(0.1, 1.0 - abs(twist - 0.2) / 0.5)
-            let tangentialGuess = axialGuess * 0.5 * solidity * twistEffect
+            let tangentialGuess = axialGuess * 0.4 * solidity * twistEffect * (r/R)
             
             return (axialGuess, tangentialGuess)
         } else {
-            // Forward flight regime - advance ratio based estimation
-            let advanceRatio = flightSpeed / (omega * R)
+            // Режим прямого полета - оценка на основе коэффициента прохождения
+            let advanceRatio = flightSpeed / tipSpeed
             let radialPosition = r / R
             
-            // Complex model based on advance ratio and radial position
-            let axialGuess = flightSpeed * (0.1 + 0.05 * advanceRatio) * (1.0 - radialPosition)
-            let tangentialGuess = flightSpeed * (0.02 + 0.01 * advanceRatio) * radialPosition
+            // Улучшенная модель с использованием локальной скорости
+            let speedRatio = localSpeed / tipSpeed
+            let axialGuess = flightSpeed * (0.08 + 0.04 * advanceRatio) * (1.0 - radialPosition) +
+                            localSpeed * 0.02 * speedRatio
+            let tangentialGuess = flightSpeed * (0.015 + 0.008 * advanceRatio) * radialPosition +
+                                 localSpeed * 0.01 * (1.0 - speedRatio)
             
             return (axialGuess, tangentialGuess)
         }
     }
     
-    /// ## Adaptive Relaxation Calculation
-    /// Dynamically adjusts relaxation factor based on convergence behavior
-    /// Improves stability and speeds up convergence
+    /// ## Расчет адаптивной релаксации
+    /// Динамически регулирует коэффициент релаксации на основе поведения сходимости
+    /// Улучшает стабильность и ускоряет сходимость
     /// - Parameters:
-    ///   - iteration: Current iteration number
-    ///   - residual: Current residual value
-    ///   - residualHistory: History of previous residuals
-    /// - Returns: Adaptive relaxation factor (0.0 to 1.0)
+    ///   - iteration: Текущий номер итерации
+    ///   - residual: Текущее значение невязки
+    ///   - residualHistory: История предыдущих невязок
+    /// - Returns: Адаптивный коэффициент релаксации (от 0.0 до 1.0)
     private func calculateAdaptiveRelaxation(iteration: Int, residual: Double, residualHistory: [Double]) -> Double {
         let baseRelaxation = 0.3
         
-        // Start with conservative relaxation
+        // Начинаем с консервативной релаксации
         if iteration < 3 {
             return 0.1
         }
         
-        // Analyze convergence trend
+        // Анализируем тренд сходимости
         if residualHistory.count >= 3 {
             let recentImprovement = residualHistory[residualHistory.count-3] - residual
             let improvementRatio = recentImprovement / residualHistory[residualHistory.count-3]
             
             if improvementRatio > 0.3 {
-                // Fast convergence - increase step size
+                // Быстрая сходимость - увеличиваем размер шага
                 return min(0.8, baseRelaxation * 1.5)
             } else if improvementRatio < 0.05 {
-                // Slow convergence - decrease step size
+                // Медленная сходимость - уменьшаем размер шага
                 return max(0.1, baseRelaxation * 0.7)
             }
         }
         
-        // Conservative relaxation for large residuals
+        // Консервативная релаксация для больших невязок
         if residual > 1.0 {
             return 0.1
         }
@@ -325,21 +330,21 @@ public class BEMTCalculator {
         return baseRelaxation
     }
     
-    /// ## Newton-Raphson Iteration
-    /// Performs single iteration of Newton-Raphson method for BEMT equations
-    /// Solves coupled system for induced velocities
+    /// ## Итерация Ньютона-Рафсона
+    /// Выполняет одиночную итерацию метода Ньютона-Рафсона для уравнений BEMT
+    /// Решает связанную систему для индуцированных скоростей
     /// - Parameters:
-    ///   - r: Radial position
-    ///   - dr: Element width
-    ///   - blade: Blade geometry
-    ///   - airfoil: Airfoil data
-    ///   - omega: Angular velocity
-    ///   - flightSpeed: Forward speed
-    ///   - numberOfBlades: Blade count
-    ///   - atmosphere: Atmospheric conditions
-    ///   - currentAxial: Current axial induced velocity
-    ///   - currentTangential: Current tangential induced velocity
-    /// - Returns: Updated velocities, forces, and convergence data
+    ///   - r: Радиальная позиция
+    ///   - dr: Ширина элемента
+    ///   - blade: Геометрия лопасти
+    ///   - airfoil: Данные профиля
+    ///   - omega: Угловая скорость
+    ///   - flightSpeed: Скорость полета вперед
+    ///   - numberOfBlades: Количество лопастей
+    ///   - atmosphere: Атмосферные условия
+    ///   - currentAxial: Текущая осевая индуцированная скорость
+    ///   - currentTangential: Текущая тангенциальная индуцированная скорость
+    /// - Returns: Обновленные скорости, силы и данные сходимости
     private func newtonRaphsonIteration(
         r: Double, dr: Double, blade: BladeGeometry, airfoil: AirfoilData, omega: Double,
         flightSpeed: Double, numberOfBlades: Int,
@@ -347,7 +352,7 @@ public class BEMTCalculator {
         currentAxial: Double, currentTangential: Double
     ) -> (axial: Double, tangential: Double, thrust: Double, torque: Double, alpha: Double, cl: Double, cd: Double, reynolds: Double, mach: Double, residual: Double) {
         
-        // Calculate forces and flow conditions
+        // Вычисляем силы и условия потока
         let (thrustBET, torqueBET, alpha, cl, cd, reynolds, mach) = calculateForces(
             r: r, dr: dr, blade: blade, airfoil: airfoil, omega: omega,
             flightSpeed: flightSpeed, numberOfBlades: numberOfBlades,
@@ -355,7 +360,7 @@ public class BEMTCalculator {
             axialInduced: currentAxial, tangentialInduced: currentTangential
         )
         
-        // Calculate tip loss factor
+        // Вычисляем коэффициент потерь на конце
         let tipLossFactor = calculateTipLossFactor(
             r: r, R: blade.radius, numberOfBlades: numberOfBlades,
             inflowAngle: calculateInflowAngle(
@@ -364,18 +369,18 @@ public class BEMTCalculator {
             )
         )
         
-        // Momentum theory equations
+        // Уравнения теории импульса
         let thrustMT = 4.0 * .pi * atmosphere.density * r * dr *
                       (flightSpeed + currentAxial) * currentAxial * tipLossFactor
         let torqueMT = 4.0 * .pi * atmosphere.density * pow(r, 3) * dr *
                       omega * currentTangential * tipLossFactor
         
-        // Calculate residuals
+        // Вычисляем невязки
         let residual1 = thrustBET - thrustMT
         let residual2 = torqueBET - torqueMT
         let residual = max(abs(residual1), abs(residual2))
         
-        // Solve for new induced velocities
+        // Решаем для новых индуцированных скоростей
         let newAxial = solveForAxialInduced(
             thrustBET: thrustBET, flightSpeed: flightSpeed,
             r: r, dr: dr, density: atmosphere.density, tipLossFactor: tipLossFactor
@@ -389,20 +394,20 @@ public class BEMTCalculator {
         return (newAxial, newTangential, thrustBET, torqueBET, alpha, cl, cd, reynolds, mach, residual)
     }
     
-    /// ## Calculate Aerodynamic Forces
-    /// Computes thrust and torque contributions from blade element
+    /// ## Вычислить аэродинамические силы
+    /// Вычисляет вклады тяги и крутящего момента от элемента лопасти
     /// - Parameters:
-    ///   - r: Radial position
-    ///   - dr: Element width
-    ///   - blade: Blade geometry
-    ///   - airfoil: Airfoil data
-    ///   - omega: Angular velocity
-    ///   - flightSpeed: Forward speed
-    ///   - numberOfBlades: Blade count
-    ///   - atmosphere: Atmospheric conditions
-    ///   - axialInduced: Axial induced velocity
-    ///   - tangentialInduced: Tangential induced velocity
-    /// - Returns: Forces, angles, and flow conditions
+    ///   - r: Радиальная позиция
+    ///   - dr: Ширина элемента
+    ///   - blade: Геометрия лопасти
+    ///   - airfoil: Данные профиля
+    ///   - omega: Угловая скорость
+    ///   - flightSpeed: Скорость полета вперед
+    ///   - numberOfBlades: Количество лопастей
+    ///   - atmosphere: Атмосферные условия
+    ///   - axialInduced: Осевая индуцированная скорость
+    ///   - tangentialInduced: Тангенциальная индуцированная скорость
+    /// - Returns: Силы, углы и условия потока
     private func calculateForces(
         r: Double, dr: Double, blade: BladeGeometry, airfoil: AirfoilData, omega: Double,
         flightSpeed: Double, numberOfBlades: Int,
@@ -410,64 +415,64 @@ public class BEMTCalculator {
         axialInduced: Double, tangentialInduced: Double
     ) -> (thrust: Double, torque: Double, alpha: Double, cl: Double, cd: Double, reynolds: Double, mach: Double) {
         
-        // Calculate local velocities
+        // Вычисляем локальные скорости
         let ut = omega * r - tangentialInduced
         let up = flightSpeed + axialInduced
         
-        // Calculate inflow angle and angle of attack
+        // Вычисляем угол притекания и угол атаки
         let inflowAngle = atan2(up, ut)
         let bladeTwist = blade.twistDistribution(r / blade.radius)
         var alpha = bladeTwist - inflowAngle
         
-        // Limit angle of attack to reasonable range
+        // Ограничиваем угол атаки разумным диапазоном
         alpha = max(-0.35, min(0.35, alpha))
         
-        // Get local geometry
+        // Получаем локальную геометрию
         let chord = blade.chordDistribution(r / blade.radius)
         let w = sqrt(ut * ut + up * up)
         
-        // Calculate flow parameters
+        // Вычисляем параметры потока
         let reynolds = w * chord / atmosphere.kinematicViscosity
         let mach = w / atmosphere.speedOfSound
         
-        // Get aerodynamic coefficients
+        // Получаем аэродинамические коэффициенты
         var (cl, cd, _) = AirfoilCalculator.getCoefficients(for: airfoil, alpha: alpha, reynolds: reynolds)
         
-        // Apply compressibility correction
+        // Применяем поправку на сжимаемость
         (cl, cd) = AirfoilCalculator.applyCompressibilityCorrection(cl: cl, cd: cd, mach: mach)
         
-        // Calculate forces
+        // Вычисляем силы
         let dynamicPressure = 0.5 * atmosphere.density * w * w
         let dL = dynamicPressure * chord * dr * cl
         let dD = dynamicPressure * chord * dr * cd
         
-        // Resolve forces into thrust and torque
+        // Разлагаем силы на тягу и крутящий момент
         let thrust = Double(numberOfBlades) * (dL * cos(inflowAngle) - dD * sin(inflowAngle))
         let torque = Double(numberOfBlades) * r * (dL * sin(inflowAngle) + dD * cos(inflowAngle))
         
         return (thrust, torque, alpha, cl, cd, reynolds, mach)
     }
     
-    // MARK: - Helper Methods
+    // MARK: - Вспомогательные методы
     
-    /// ## Calculate Tip Loss Factor
-    /// Prandtl's tip loss factor correction
-    /// Accounts for finite number of blades and tip vortices
+    /// ## Вычислить коэффициент потерь на конце
+    /// Поправка коэффициента потерь на конце Прандтля
+    /// Учитывает конечное количество лопастей и концевые вихри
     private func calculateTipLossFactor(r: Double, R: Double, numberOfBlades: Int, inflowAngle: Double) -> Double {
         let f = Double(numberOfBlades) * (R - r) / (2.0 * r * sin(inflowAngle))
         return (2.0 / .pi) * acos(exp(-f))
     }
     
-    /// ## Calculate Inflow Angle
-    /// Angle between rotation plane and resultant flow
+    /// ## Вычислить угол притекания
+    /// Угол между плоскостью вращения и результирующим потоком
     private func calculateInflowAngle(r: Double, omega: Double, flightSpeed: Double, axialInduced: Double, tangentialInduced: Double) -> Double {
         let ut = omega * r - tangentialInduced
         let up = flightSpeed + axialInduced
         return atan2(up, ut)
     }
     
-    /// ## Solve for Axial Induced Velocity
-    /// Analytical solution for axial induced velocity from momentum theory
+    /// ## Решить для осевой индуцированной скорости
+    /// Аналитическое решение для осевой индуцированной скорости из теории импульса
     private func solveForAxialInduced(thrustBET: Double, flightSpeed: Double, r: Double, dr: Double, density: Double, tipLossFactor: Double) -> Double {
         if thrustBET <= 0 { return 0.0 }
         
@@ -479,23 +484,23 @@ public class BEMTCalculator {
         }
     }
     
-    /// ## Solve for Tangential Induced Velocity
-    /// Analytical solution for tangential induced velocity from momentum theory
+    /// ## Решить для тангенциальной индуцированной скорости
+    /// Аналитическое решение для тангенциальной индуцированной скорости из теории импульса
     private func solveForTangentialInduced(torqueBET: Double, omega: Double, r: Double, dr: Double, density: Double, tipLossFactor: Double) -> Double {
         if torqueBET <= 0 { return 0.0 }
         return torqueBET / (4.0 * .pi * density * pow(r, 3) * dr * omega * tipLossFactor)
     }
     
-    /// ## Fallback Calculation Method
-    /// Simplified calculation when iterative method fails to converge
-    /// Provides reasonable estimates without iteration
+    /// ## Резервный метод расчета
+    /// Упрощенный расчет когда итерационный метод не сходится
+    /// Предоставляет разумные оценки без итераций
     private func calculateBladeElementFallback(
         r: Double, dr: Double, blade: BladeGeometry, airfoil: AirfoilData, omega: Double,
         flightSpeed: Double, numberOfBlades: Int,
         atmosphere: (temperature: Double, pressure: Double, density: Double, speedOfSound: Double, kinematicViscosity: Double)
     ) -> (thrust: Double, torque: Double, residual: Double, iterations: Int, residualHistory: [Double], alpha: Double, cl: Double, cd: Double, reynolds: Double, mach: Double) {
         
-        // Simplified calculation without induced velocities
+        // Упрощенный расчет без индуцированных скоростей
         let chord = blade.chordDistribution(r / blade.radius)
         let twist = blade.twistDistribution(r / blade.radius)
         
@@ -522,18 +527,18 @@ public class BEMTCalculator {
         return (thrust, torque, 0.01, 1, [0.01], alpha, cl, cd, reynolds, mach)
     }
     
-    /// ## Calculate Propeller Efficiency
-    /// Computes efficiency metric for current operating condition
-    /// Different formulas for hover and forward flight
+    /// ## Вычислить эффективность пропеллера
+    /// Вычисляет метрику эффективности для текущих рабочих условий
+    /// Разные формулы для зависания и прямого полета
     private func calculateEfficiency(thrust: Double, power: Double, speed: Double, area: Double, density: Double) -> Double {
         guard power > 0 else { return 0.0 }
         
         if speed == 0 {
-            // Figure of merit for hover
+            // Показатель качества для зависания
             let idealPower = thrust * sqrt(thrust / (2.0 * density * area))
             return idealPower / power
         } else {
-            // Propulsive efficiency for forward flight
+            // Движущая эффективность для прямого полета
             return (thrust * speed) / power
         }
     }

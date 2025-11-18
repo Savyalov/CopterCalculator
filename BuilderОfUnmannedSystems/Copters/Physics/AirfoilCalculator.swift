@@ -7,21 +7,21 @@
 
 import Foundation
 
-/// # Airfoil Coefficient Calculator
-/// Provides interpolation and calculation services for airfoil aerodynamic coefficients
-/// Handles Reynolds number effects and compressibility corrections
+/// # Калькулятор коэффициентов аэродинамического профиля
+/// Предоставляет услуги интерполяции и расчета аэродинамических коэффициентов профиля
+/// Обрабатывает эффекты числа Рейнольдса и поправки на сжимаемость
 public class AirfoilCalculator {
     
-    // MARK: - Public Methods
+    // MARK: - Публичные методы
     
-    /// ## Get Aerodynamic Coefficients
-    /// Retrieves interpolated aerodynamic coefficients for specified conditions
-    /// Performs bilinear interpolation in Reynolds number and angle of attack
+    /// ## Получить аэродинамические коэффициенты
+    /// Получает интерполированные аэродинамические коэффициенты для указанных условий
+    /// Выполняет билинейную интерполяцию по числу Рейнольдса и углу атаки
     /// - Parameters:
-    ///   - airfoil: Airfoil data containing coefficient tables
-    ///   - alpha: Angle of attack in radians
-    ///   - reynolds: Reynolds number based on chord and flow conditions
-    /// - Returns: Tuple of (cl, cd, cm) coefficients
+    ///   - airfoil: Данные профиля, содержащие таблицы коэффициентов
+    ///   - alpha: Угол атаки в радианах
+    ///   - reynolds: Число Рейнольдса на основе хорды и условий потока
+    /// - Returns: Кортеж коэффициентов (cl, cd, cm)
     public static func getCoefficients(for airfoil: AirfoilData, alpha: Double, reynolds: Double) -> (cl: Double, cd: Double, cm: Double) {
         guard let lowerIndex = findReynoldsIndex(reynolds, in: airfoil.reynoldsNumbers) else {
             return interpolateForSingleReynolds(airfoil: airfoil, alpha: alpha, reynolds: reynolds)
@@ -42,13 +42,13 @@ public class AirfoilCalculator {
         )
     }
     
-    /// ## Apply Compressibility Correction
-    /// Applies Prandtl-Glauert correction for compressibility effects at high Mach numbers
+    /// ## Применить поправку на сжимаемость
+    /// Применяет поправку Прандтля-Глауэрта для эффектов сжимаемости при высоких числах Маха
     /// - Parameters:
-    ///   - cl: Incompressible lift coefficient
-    ///   - cd: Incompressible drag coefficient
-    ///   - mach: Mach number of the flow
-    /// - Returns: Compressibility-corrected (cl, cd) coefficients
+    ///   - cl: Коэффициент подъемной силы для несжимаемой жидкости
+    ///   - cd: Коэффициент сопротивления для несжимаемой жидкости
+    ///   - mach: Число Маха потока
+    /// - Returns: Коэффициенты (cl, cd) с поправкой на сжимаемость
     public static func applyCompressibilityCorrection(cl: Double, cd: Double, mach: Double) -> (cl: Double, cd: Double) {
         guard mach > 0.3 else { return (cl, cd) }
         
@@ -56,14 +56,14 @@ public class AirfoilCalculator {
         return (cl / beta, cd / beta)
     }
     
-    // MARK: - Private Methods
+    // MARK: - Приватные методы
     
-    /// ## Find Reynolds Index
-    /// Locates the appropriate Reynolds number interval for interpolation
+    /// ## Найти индекс Рейнольдса
+    /// Определяет соответствующий интервал числа Рейнольдса для интерполяции
     /// - Parameters:
-    ///   - reynolds: Target Reynolds number
-    ///   - reynoldsNumbers: Array of available Reynolds numbers
-    /// - Returns: Lower index of the interval, or nil if out of range
+    ///   - reynolds: Целевое число Рейнольдса
+    ///   - reynoldsNumbers: Массив доступных чисел Рейнольдса
+    /// - Returns: Нижний индекс интервала или nil, если вне диапазона
     private static func findReynoldsIndex(_ reynolds: Double, in reynoldsNumbers: [Double]) -> Int? {
         for i in 0..<reynoldsNumbers.count-1 {
             if reynolds >= reynoldsNumbers[i] && reynolds <= reynoldsNumbers[i+1] {
@@ -73,13 +73,13 @@ public class AirfoilCalculator {
         return nil
     }
     
-    /// ## Interpolate for Specific Reynolds Number
-    /// Performs angle of attack interpolation for a fixed Reynolds number
+    /// ## Интерполяция для конкретного числа Рейнольдса
+    /// Выполняет интерполяцию по углу атаки для фиксированного числа Рейнольдса
     /// - Parameters:
-    ///   - airfoil: Airfoil data
-    ///   - index: Reynolds number index
-    ///   - alpha: Target angle of attack
-    /// - Returns: Interpolated coefficients (cl, cd, cm)
+    ///   - airfoil: Данные профиля
+    ///   - index: Индекс числа Рейнольдса
+    ///   - alpha: Целевой угол атаки
+    /// - Returns: Интерполированные коэффициенты (cl, cd, cm)
     private static func interpolateForReynolds(airfoil: AirfoilData, at index: Int, alpha: Double) -> (cl: Double, cd: Double, cm: Double) {
         let alphas = airfoil.alpha[index]
         let cls = airfoil.cl[index]
@@ -95,28 +95,28 @@ public class AirfoilCalculator {
                 return (cl, cd, cm)
             }
         }
-        return (0, 0.02, 0) // Default values if out of range
+        return (0, 0.02, 0) // Значения по умолчанию, если вне диапазона
     }
     
-    /// ## Interpolate for Single Reynolds Number
-    /// Fallback method when Reynolds number is outside available range
-    /// Uses closest available Reynolds number data
+    /// ## Интерполяция для одного числа Рейнольдса
+    /// Резервный метод, когда число Рейнольдса находится вне доступного диапазона
+    /// Использует данные ближайшего доступного числа Рейнольдса
     /// - Parameters:
-    ///   - airfoil: Airfoil data
-    ///   - alpha: Target angle of attack
-    ///   - reynolds: Target Reynolds number
-    /// - Returns: Coefficients from closest Reynolds number
+    ///   - airfoil: Данные профиля
+    ///   - alpha: Целевой угол атаки
+    ///   - reynolds: Целевое число Рейнольдса
+    /// - Returns: Коэффициенты из ближайшего числа Рейнольдса
     private static func interpolateForSingleReynolds(airfoil: AirfoilData, alpha: Double, reynolds: Double) -> (cl: Double, cd: Double, cm: Double) {
         let closestIndex = findClosestReynoldsIndex(reynolds, in: airfoil.reynoldsNumbers)
         return interpolateForReynolds(airfoil: airfoil, at: closestIndex, alpha: alpha)
     }
     
-    /// ## Find Closest Reynolds Index
-    /// Locates the closest available Reynolds number when exact match not available
+    /// ## Найти ближайший индекс Рейнольдса
+    /// Определяет ближайшее доступное число Рейнольдса, когда точное совпадение недоступно
     /// - Parameters:
-    ///   - reynolds: Target Reynolds number
-    ///   - reynoldsNumbers: Array of available Reynolds numbers
-    /// - Returns: Index of closest Reynolds number
+    ///   - reynolds: Целевое число Рейнольдса
+    ///   - reynoldsNumbers: Массив доступных чисел Рейнольдса
+    /// - Returns: Индекс ближайшего числа Рейнольдса
     private static func findClosestReynoldsIndex(_ reynolds: Double, in reynoldsNumbers: [Double]) -> Int {
         var minDifference = Double.greatestFiniteMagnitude
         var closestIndex = 0

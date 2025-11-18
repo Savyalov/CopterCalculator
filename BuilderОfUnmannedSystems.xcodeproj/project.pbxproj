@@ -6,11 +6,27 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		48559B5A2ECD19F40002E05C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 486107232EC6A2D7007F022B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4861072A2EC6A2D7007F022B;
+			remoteInfo = Calculator;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
-		4861072B2EC6A2D7007F022B /* Calculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Calculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		48559B562ECD19F40002E05C /* CopterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CopterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4861072B2EC6A2D7007F022B /* BuilderОfUnmannedSystems.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "BuilderОfUnmannedSystems.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		48559B572ECD19F40002E05C /* CopterTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = CopterTests;
+			sourceTree = "<group>";
+		};
 		4861072D2EC6A2D7007F022B /* BuilderОfUnmannedSystems */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "BuilderОfUnmannedSystems";
@@ -19,6 +35,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		48559B532ECD19F40002E05C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		486107282EC6A2D7007F022B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -33,6 +56,7 @@
 			isa = PBXGroup;
 			children = (
 				4861072D2EC6A2D7007F022B /* BuilderОfUnmannedSystems */,
+				48559B572ECD19F40002E05C /* CopterTests */,
 				4861072C2EC6A2D7007F022B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -40,7 +64,8 @@
 		4861072C2EC6A2D7007F022B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4861072B2EC6A2D7007F022B /* Calculator.app */,
+				4861072B2EC6A2D7007F022B /* BuilderОfUnmannedSystems.app */,
+				48559B562ECD19F40002E05C /* CopterTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +73,32 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4861072A2EC6A2D7007F022B /* Calculator */ = {
+		48559B552ECD19F40002E05C /* CopterTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 486107362EC6A2D8007F022B /* Build configuration list for PBXNativeTarget "Calculator" */;
+			buildConfigurationList = 48559B5C2ECD19F40002E05C /* Build configuration list for PBXNativeTarget "CopterTests" */;
+			buildPhases = (
+				48559B522ECD19F40002E05C /* Sources */,
+				48559B532ECD19F40002E05C /* Frameworks */,
+				48559B542ECD19F40002E05C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				48559B5B2ECD19F40002E05C /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				48559B572ECD19F40002E05C /* CopterTests */,
+			);
+			name = CopterTests;
+			packageProductDependencies = (
+			);
+			productName = CopterTests;
+			productReference = 48559B562ECD19F40002E05C /* CopterTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		4861072A2EC6A2D7007F022B /* BuilderОfUnmannedSystems */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 486107362EC6A2D8007F022B /* Build configuration list for PBXNativeTarget "BuilderОfUnmannedSystems" */;
 			buildPhases = (
 				486107272EC6A2D7007F022B /* Sources */,
 				486107282EC6A2D7007F022B /* Frameworks */,
@@ -63,11 +111,11 @@
 			fileSystemSynchronizedGroups = (
 				4861072D2EC6A2D7007F022B /* BuilderОfUnmannedSystems */,
 			);
-			name = Calculator;
+			name = "BuilderОfUnmannedSystems";
 			packageProductDependencies = (
 			);
 			productName = PropellerCalculator;
-			productReference = 4861072B2EC6A2D7007F022B /* Calculator.app */;
+			productReference = 4861072B2EC6A2D7007F022B /* BuilderОfUnmannedSystems.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -80,6 +128,10 @@
 				LastSwiftUpdateCheck = 2610;
 				LastUpgradeCheck = 2610;
 				TargetAttributes = {
+					48559B552ECD19F40002E05C = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = 4861072A2EC6A2D7007F022B;
+					};
 					4861072A2EC6A2D7007F022B = {
 						CreatedOnToolsVersion = 26.1;
 						LastSwiftMigration = 2610;
@@ -100,12 +152,20 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4861072A2EC6A2D7007F022B /* Calculator */,
+				4861072A2EC6A2D7007F022B /* BuilderОfUnmannedSystems */,
+				48559B552ECD19F40002E05C /* CopterTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		48559B542ECD19F40002E05C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		486107292EC6A2D7007F022B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -116,6 +176,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		48559B522ECD19F40002E05C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		486107272EC6A2D7007F022B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -125,7 +192,55 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		48559B5B2ECD19F40002E05C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4861072A2EC6A2D7007F022B /* BuilderОfUnmannedSystems */;
+			targetProxy = 48559B5A2ECD19F40002E05C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		48559B5D2ECD19F40002E05C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 88EEUXLUZW;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = fg.my.com.CopterTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BuilderОfUnmannedSystems.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BuilderОfUnmannedSystems";
+			};
+			name = Debug;
+		};
+		48559B5E2ECD19F40002E05C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 88EEUXLUZW;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = fg.my.com.CopterTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BuilderОfUnmannedSystems.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BuilderОfUnmannedSystems";
+			};
+			name = Release;
+		};
 		486107342EC6A2D8007F022B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -251,6 +366,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -267,8 +383,8 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.yourcompany.PropellerCalculator;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourcompany.BuilderOfUnmannedSystems;
+				PRODUCT_NAME = "BuilderОfUnmannedSystems";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -285,6 +401,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -301,8 +418,8 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.yourcompany.PropellerCalculator;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourcompany.BuilderOfUnmannedSystems;
+				PRODUCT_NAME = "BuilderОfUnmannedSystems";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -316,6 +433,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		48559B5C2ECD19F40002E05C /* Build configuration list for PBXNativeTarget "CopterTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				48559B5D2ECD19F40002E05C /* Debug */,
+				48559B5E2ECD19F40002E05C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		486107262EC6A2D7007F022B /* Build configuration list for PBXProject "BuilderОfUnmannedSystems" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -325,7 +451,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		486107362EC6A2D8007F022B /* Build configuration list for PBXNativeTarget "Calculator" */ = {
+		486107362EC6A2D8007F022B /* Build configuration list for PBXNativeTarget "BuilderОfUnmannedSystems" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				486107372EC6A2D8007F022B /* Debug */,

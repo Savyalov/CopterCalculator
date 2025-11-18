@@ -7,49 +7,49 @@
 
 import Foundation
 
-/// # Airfoil Data Model
-/// Contains comprehensive aerodynamic coefficients for different Reynolds numbers and angles of attack
-/// Used for interpolation and calculation of lift, drag, and moment coefficients
+/// # Модель данных аэродинамического профиля
+/// Содержит комплексные аэродинамические коэффициенты для различных чисел Рейнольдса и углов атаки
+/// Используется для интерполяции и расчета коэффициентов подъемной силы, сопротивления и момента
 public struct AirfoilData {
     
-    // MARK: - Public Properties
+    // MARK: - Публичные свойства
     
-    /// ## Reynolds Numbers Array
-    /// Array of Reynolds numbers for which aerodynamic data is available
-    /// Used to interpolate coefficients for intermediate Reynolds numbers
+    /// ## Массив чисел Рейнольдса
+    /// Массив чисел Рейнольдса, для которых доступны аэродинамические данные
+    /// Используется для интерполяции коэффициентов для промежуточных чисел Рейнольдса
     public let reynoldsNumbers: [Double]
     
-    /// ## Angle of Attack Arrays
-    /// 2D array containing angles of attack (in radians) for each Reynolds number
-    /// First dimension: Reynolds number index
-    /// Second dimension: Angles of attack for that Reynolds number
+    /// ## Массивы углов атаки
+    /// Двумерный массив, содержащий углы атаки (в радианах) для каждого числа Рейнольдса
+    /// Первое измерение: индекс числа Рейнольдса
+    /// Второе измерение: углы атаки для этого числа Рейнольдса
     public let alpha: [[Double]]
     
-    /// ## Lift Coefficient Arrays
-    /// 2D array containing lift coefficients (Cl) corresponding to angles of attack
-    /// Used to calculate lift force on blade elements
+    /// ## Массивы коэффициентов подъемной силы
+    /// Двумерный массив, содержащий коэффициенты подъемной силы (Cl), соответствующие углам атаки
+    /// Используется для расчета подъемной силы на элементах лопасти
     public let cl: [[Double]]
     
-    /// ## Drag Coefficient Arrays
-    /// 2D array containing drag coefficients (Cd) corresponding to angles of attack
-    /// Used to calculate drag force on blade elements
+    /// ## Массивы коэффициентов сопротивления
+    /// Двумерный массив, содержащий коэффициенты сопротивления (Cd), соответствующие углам атаки
+    /// Используется для расчета силы сопротивления на элементах лопасти
     public let cd: [[Double]]
     
-    /// ## Moment Coefficient Arrays
-    /// 2D array containing moment coefficients (Cm) corresponding to angles of attack
-    /// Used for pitching moment calculations (optional)
+    /// ## Массивы коэффициентов момента
+    /// Двумерный массив, содержащий коэффициенты момента (Cm), соответствующие углам атаки
+    /// Используется для расчетов момента тангажа (опционально)
     public let cm: [[Double]]
     
-    // MARK: - Initialization
+    // MARK: - Инициализация
     
-    /// ## Initializer
-    /// Creates a new AirfoilData instance with specified aerodynamic coefficients
+    /// ## Инициализатор
+    /// Создает новый экземпляр AirfoilData с указанными аэродинамическими коэффициентами
     /// - Parameters:
-    ///   - reynoldsNumbers: Array of Reynolds numbers
-    ///   - alpha: 2D array of angles of attack in radians
-    ///   - cl: 2D array of lift coefficients
-    ///   - cd: 2D array of drag coefficients
-    ///   - cm: 2D array of moment coefficients
+    ///   - reynoldsNumbers: Массив чисел Рейнольдса
+    ///   - alpha: Двумерный массив углов атаки в радианах
+    ///   - cl: Двумерный массив коэффициентов подъемной силы
+    ///   - cd: Двумерный массив коэффициентов сопротивления
+    ///   - cm: Двумерный массив коэффициентов момента
     public init(reynoldsNumbers: [Double], alpha: [[Double]], cl: [[Double]], cd: [[Double]], cm: [[Double]]) {
         self.reynoldsNumbers = reynoldsNumbers
         self.alpha = alpha
@@ -58,15 +58,15 @@ public struct AirfoilData {
         self.cm = cm
     }
     
-    // MARK: - Public Methods
+    // MARK: - Публичные методы
     
-    /// ## Get Aerodynamic Coefficients
-    /// Interpolates aerodynamic coefficients for given angle of attack and Reynolds number
-    /// Uses bilinear interpolation between available data points
+    /// ## Получить аэродинамические коэффициенты
+    /// Интерполирует аэродинамические коэффициенты для заданного угла атаки и числа Рейнольдса
+    /// Использует билинейную интерполяцию между доступными точками данных
     /// - Parameters:
-    ///   - alpha: Angle of attack in radians
-    ///   - reynolds: Reynolds number
-    /// - Returns: Tuple containing (cl, cd, cm) coefficients
+    ///   - alpha: Угол атаки в радианах
+    ///   - reynolds: Число Рейнольдса
+    /// - Returns: Кортеж, содержащий коэффициенты (cl, cd, cm)
     public func getCoefficients(for alpha: Double, reynolds: Double) -> (cl: Double, cd: Double, cm: Double) {
         guard let lowerIndex = findReynoldsIndex(reynolds) else {
             return interpolateForSingleReynolds(alpha: alpha, reynolds: reynolds)
@@ -87,12 +87,12 @@ public struct AirfoilData {
         )
     }
     
-    // MARK: - Private Methods
+    // MARK: - Приватные методы
     
-    /// ## Find Reynolds Index
-    /// Locates the appropriate Reynolds number interval for interpolation
-    /// - Parameter reynolds: Target Reynolds number
-    /// - Returns: Lower index of Reynolds number interval, or nil if out of range
+    /// ## Найти индекс Рейнольдса
+    /// Определяет соответствующий интервал числа Рейнольдса для интерполяции
+    /// - Parameter reynolds: Целевое число Рейнольдса
+    /// - Returns: Нижний индекс интервала числа Рейнольдса или nil, если вне диапазона
     private func findReynoldsIndex(_ reynolds: Double) -> Int? {
         for i in 0..<reynoldsNumbers.count-1 {
             if reynolds >= reynoldsNumbers[i] && reynolds <= reynoldsNumbers[i+1] {
@@ -102,12 +102,12 @@ public struct AirfoilData {
         return nil
     }
     
-    /// ## Interpolate for Specific Reynolds Number
-    /// Performs linear interpolation of coefficients for a specific Reynolds number index
+    /// ## Интерполяция для конкретного числа Рейнольдса
+    /// Выполняет линейную интерполяцию коэффициентов для конкретного индекса числа Рейнольдса
     /// - Parameters:
-    ///   - index: Reynolds number index in the data arrays
-    ///   - alpha: Target angle of attack
-    /// - Returns: Interpolated coefficients (cl, cd, cm)
+    ///   - index: Индекс числа Рейнольдса в массивах данных
+    ///   - alpha: Целевой угол атаки
+    /// - Returns: Интерполированные коэффициенты (cl, cd, cm)
     private func interpolateForReynolds(at index: Int, alpha: Double) -> (cl: Double, cd: Double, cm: Double) {
         let alphas = self.alpha[index]
         let cls = self.cl[index]
@@ -123,25 +123,25 @@ public struct AirfoilData {
                 return (cl, cd, cm)
             }
         }
-        return (0, 0.02, 0) // Default values if out of range
+        return (0, 0.02, 0) // Значения по умолчанию, если вне диапазона
     }
     
-    /// ## Interpolate for Single Reynolds Number
-    /// Fallback method when target Reynolds number is outside available ranges
-    /// Uses closest available Reynolds number data
+    /// ## Интерполяция для одного числа Рейнольдса
+    /// Резервный метод, когда целевое число Рейнольдса находится вне доступных диапазонов
+    /// Использует данные ближайшего доступного числа Рейнольдса
     /// - Parameters:
-    ///   - alpha: Target angle of attack
-    ///   - reynolds: Target Reynolds number
-    /// - Returns: Coefficients from closest Reynolds number data
+    ///   - alpha: Целевой угол атаки
+    ///   - reynolds: Целевое число Рейнольдса
+    /// - Returns: Коэффициенты из данных ближайшего числа Рейнольдса
     private func interpolateForSingleReynolds(alpha: Double, reynolds: Double) -> (cl: Double, cd: Double, cm: Double) {
         let closestIndex = findClosestReynoldsIndex(reynolds)
         return interpolateForReynolds(at: closestIndex, alpha: alpha)
     }
     
-    /// ## Find Closest Reynolds Index
-    /// Locates the closest available Reynolds number when exact match is not available
-    /// - Parameter reynolds: Target Reynolds number
-    /// - Returns: Index of closest Reynolds number in the data array
+    /// ## Найти ближайший индекс Рейнольдса
+    /// Определяет ближайшее доступное число Рейнольдса, когда точное совпадение недоступно
+    /// - Parameter reynolds: Целевое число Рейнольдса
+    /// - Returns: Индекс ближайшего числа Рейнольдса в массиве данных
     private func findClosestReynoldsIndex(_ reynolds: Double) -> Int {
         var minDifference = Double.greatestFiniteMagnitude
         var closestIndex = 0

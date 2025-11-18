@@ -7,54 +7,54 @@
 
 import Foundation
 
-/// # BEMT Calculation Result
-/// Contains comprehensive results from Blade Element Momentum Theory calculation
-/// Includes performance metrics, convergence data, and detailed element information
+/// # Результат расчета BEMT
+/// Содержит комплексные результаты расчета по теории элемента лопасти и импульса
+/// Включает метрики производительности, данные о сходимости и детальную информацию по элементам
 public struct BEMTResult {
     
-    // MARK: - Public Properties
+    // MARK: - Публичные свойства
     
-    /// ## Total Thrust
-    /// Total thrust produced by all propellers in Newtons
-    /// Primary performance metric for propulsion system
+    /// ## Суммарная тяга
+    /// Общая тяга, создаваемая всеми пропеллерами в Ньютонах
+    /// Основная метрика производительности двигательной системы
     public let thrust: Double
     
-    /// ## Total Torque
-    /// Total torque required to drive all propellers in Newton-meters
-    /// Used for motor selection and power calculation
+    /// ## Суммарный крутящий момент
+    /// Общий крутящий момент, требуемый для вращения всех пропеллеров в Ньютон-метрах
+    /// Используется для выбора мотора и расчета мощности
     public let torque: Double
     
-    /// ## Total Power
-    /// Total mechanical power consumed by all propellers in Watts
-    /// Calculated as torque × angular velocity
+    /// ## Суммарная мощность
+    /// Общая механическая мощность, потребляемая всеми пропеллерами в Ваттах
+    /// Рассчитывается как крутящий момент × угловая скорость
     public let power: Double
     
-    /// ## Propeller Efficiency
-    /// Overall efficiency of the propeller system (0.0 to 1.0)
-    /// Ratio of useful power to input power
+    /// ## Эффективность пропеллера
+    /// Общая эффективность системы пропеллеров (от 0.0 до 1.0)
+    /// Отношение полезной мощности к входной мощности
     public let efficiency: Double
     
-    /// ## Convergence Information
-    /// Detailed data about the iterative solution process
-    /// Includes iteration count, residuals, and convergence status
+    /// ## Информация о сходимости
+    /// Детальные данные о процессе итерационного решения
+    /// Включает количество итераций, невязки и статус сходимости
     public let convergenceInfo: ConvergenceInfo
     
-    /// ## Element Data
-    /// Optional detailed data for each blade element
-    /// Provides insight into radial distribution of forces and flow conditions
+    /// ## Данные по элементам
+    /// Опциональные детальные данные для каждого элемента лопасти
+    /// Обеспечивает понимание радиального распределения сил и условий потока
     public let elementData: [BladeElementData]?
     
-    // MARK: - Initialization
+    // MARK: - Инициализация
     
-    /// ## BEMT Result Initializer
-    /// Creates a complete BEMT calculation result
+    /// ## Инициализатор результата BEMT
+    /// Создает полный результат расчета BEMT
     /// - Parameters:
-    ///   - thrust: Total thrust in N
-    ///   - torque: Total torque in N·m
-    ///   - power: Total power in W
-    ///   - efficiency: Propeller efficiency
-    ///   - convergenceInfo: Convergence data
-    ///   - elementData: Optional element-wise data
+    ///   - thrust: Суммарная тяга в Н
+    ///   - torque: Суммарный крутящий момент в Н·м
+    ///   - power: Суммарная мощность в Вт
+    ///   - efficiency: Эффективность пропеллера
+    ///   - convergenceInfo: Данные о сходимости
+    ///   - elementData: Опциональные данные по элементам
     public init(thrust: Double, torque: Double, power: Double, efficiency: Double,
                 convergenceInfo: ConvergenceInfo, elementData: [BladeElementData]?) {
         self.thrust = thrust
@@ -66,48 +66,48 @@ public struct BEMTResult {
     }
 }
 
-/// # Convergence Information
-/// Detailed data about the iterative solution process in BEMT calculation
-/// Helps users understand the reliability and accuracy of results
+/// # Информация о сходимости
+/// Детальные данные о процессе итерационного решения в расчете BEMT
+/// Помогает пользователям понять надежность и точность результатов
 public struct ConvergenceInfo {
     
-    // MARK: - Public Properties
+    // MARK: - Публичные свойства
     
-    /// ## Iteration Count
-    /// Number of iterations performed to reach convergence
-    /// Higher values may indicate difficult convergence conditions
+    /// ## Количество итераций
+    /// Количество выполненных итераций для достижения сходимости
+    /// Большие значения могут указывать на сложные условия сходимости
     public let iterations: Int
     
-    /// ## Maximum Residual
-    /// Largest residual value at convergence
-    /// Indicates how well the solution satisfied the equations
+    /// ## Максимальная невязка
+    /// Наибольшее значение невязки при сходимости
+    /// Показывает, насколько хорошо решение удовлетворяет уравнениям
     public let maxResidual: Double
     
-    /// ## Convergence Status
-    /// Whether the iterative process successfully converged
-    /// False indicates the solution may not be reliable
+    /// ## Статус сходимости
+    /// Успешно ли завершился итерационный процесс
+    /// False указывает, что решение может быть ненадежным
     public let converged: Bool
     
-    /// ## Residual History
-    /// Array of residual values from each iteration
-    /// Shows the convergence trajectory and stability
+    /// ## История невязок
+    /// Массив значений невязок с каждой итерации
+    /// Показывает траекторию сходимости и стабильность
     public let residualHistory: [Double]
     
-    /// ## Element-wise Iterations
-    /// Number of iterations required for each blade element
-    /// Identifies problematic radial positions
+    /// ## Итерации по элементам
+    /// Количество итераций, требуемых для каждого элемента лопасти
+    /// Идентифицирует проблемные радиальные позиции
     public let elementWiseIterations: [Int]
     
-    // MARK: - Initialization
+    // MARK: - Инициализация
     
-    /// ## Convergence Info Initializer
-    /// Creates convergence information for BEMT results
+    /// ## Инициализатор информации о сходимости
+    /// Создает информацию о сходимости для результатов BEMT
     /// - Parameters:
-    ///   - iterations: Number of iterations
-    ///   - maxResidual: Maximum residual value
-    ///   - converged: Convergence status
-    ///   - residualHistory: History of residuals
-    ///   - elementWiseIterations: Iterations per element
+    ///   - iterations: Количество итераций
+    ///   - maxResidual: Максимальное значение невязки
+    ///   - converged: Статус сходимости
+    ///   - residualHistory: История невязок
+    ///   - elementWiseIterations: Итерации на элемент
     public init(iterations: Int, maxResidual: Double, converged: Bool,
                 residualHistory: [Double], elementWiseIterations: [Int]) {
         self.iterations = iterations
@@ -118,72 +118,72 @@ public struct ConvergenceInfo {
     }
 }
 
-/// # Blade Element Data
-/// Detailed aerodynamic and performance data for individual blade elements
-/// Used for advanced analysis and optimization
+/// # Данные элемента лопасти
+/// Детальные аэродинамические и производительностные данные для отдельных элементов лопасти
+/// Используется для продвинутого анализа и оптимизации
 public struct BladeElementData {
     
-    // MARK: - Public Properties
+    // MARK: - Публичные свойства
     
-    /// ## Radial Position
-    /// Distance from rotation center to element center in meters
-    /// Identifies the location along the blade span
+    /// ## Радиальная позиция
+    /// Расстояние от центра вращения до центра элемента в метрах
+    /// Определяет местоположение вдоль размаха лопасти
     public let radius: Double
     
-    /// ## Element Thrust
-    /// Thrust contribution from this element in Newtons
-    /// Shows how thrust is distributed along the blade
+    /// ## Тяга элемента
+    /// Вклад в тягу от этого элемента в Ньютонах
+    /// Показывает как тяга распределена вдоль лопасти
     public let thrust: Double
     
-    /// ## Element Torque
-    /// Torque contribution from this element in Newton-meters
-    /// Shows how torque is distributed along the blade
+    /// ## Крутящий момент элемента
+    /// Вклад в крутящий момент от этого элемента в Ньютон-метрах
+    /// Показывает как крутящий момент распределен вдоль лопасти
     public let torque: Double
     
-    /// ## Angle of Attack
-    /// Local angle of attack in radians
-    /// Key aerodynamic parameter for each element
+    /// ## Угол атаки
+    /// Локальный угол атаки в радианах
+    /// Ключевой аэродинамический параметр для каждого элемента
     public let alpha: Double
     
-    /// ## Lift Coefficient
-    /// Local lift coefficient for the airfoil
-    /// Determines lifting capability at this element
+    /// ## Коэффициент подъемной силы
+    /// Локальный коэффициент подъемной силы для профиля
+    /// Определяет несущую способность в этом элементе
     public let cl: Double
     
-    /// ## Drag Coefficient
-    /// Local drag coefficient for the airfoil
-    /// Determines drag penalty at this element
+    /// ## Коэффициент лобового сопротивления
+    /// Локальный коэффициент лобового сопротивления для профиля
+    /// Определяет потери на сопротивление в этом элементе
     public let cd: Double
     
-    /// ## Reynolds Number
-    /// Local Reynolds number based on chord and flow conditions
-    /// Affects airfoil performance and transition behavior
+    /// ## Число Рейнольдса
+    /// Локальное число Рейнольдса на основе хорды и условий потока
+    /// Влияет на производительность профиля и поведение перехода
     public let reynolds: Double
     
-    /// ## Mach Number
-    /// Local Mach number based on flow velocity
-    /// Important for compressibility effects at high speeds
+    /// ## Число Маха
+    /// Локальное число Маха на основе скорости потока
+    /// Важно для эффектов сжимаемости на высоких скоростях
     public let mach: Double
     
-    /// ## Iteration Count
-    /// Number of iterations required for this element to converge
-    /// Indicates numerical difficulty at this radial position
+    /// ## Количество итераций
+    /// Количество итераций, потребовавшихся для сходимости этого элемента
+    /// Указывает на численные сложности в этой радиальной позиции
     public let iterations: Int
     
-    // MARK: - Initialization
+    // MARK: - Инициализация
     
-    /// ## Blade Element Data Initializer
-    /// Creates detailed element data for analysis
+    /// ## Инициализатор данных элемента лопасти
+    /// Создает детальные данные элемента для анализа
     /// - Parameters:
-    ///   - radius: Radial position in meters
-    ///   - thrust: Thrust contribution in N
-    ///   - torque: Torque contribution in N·m
-    ///   - alpha: Angle of attack in radians
-    ///   - cl: Lift coefficient
-    ///   - cd: Drag coefficient
-    ///   - reynolds: Reynolds number
-    ///   - mach: Mach number
-    ///   - iterations: Iteration count
+    ///   - radius: Радиальная позиция в метрах
+    ///   - thrust: Вклад в тягу в Н
+    ///   - torque: Вклад в крутящий момент в Н·м
+    ///   - alpha: Угол атаки в радианах
+    ///   - cl: Коэффициент подъемной силы
+    ///   - cd: Коэффициент лобового сопротивления
+    ///   - reynolds: Число Рейнольдса
+    ///   - mach: Число Маха
+    ///   - iterations: Количество итераций
     public init(radius: Double, thrust: Double, torque: Double, alpha: Double, cl: Double,
                 cd: Double, reynolds: Double, mach: Double, iterations: Int) {
         self.radius = radius
