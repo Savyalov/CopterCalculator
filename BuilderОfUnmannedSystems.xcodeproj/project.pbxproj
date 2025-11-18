@@ -11,9 +11,9 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		4861072D2EC6A2D7007F022B /* Calculator */ = {
+		4861072D2EC6A2D7007F022B /* BuilderОfUnmannedSystems */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Calculator;
+			path = "BuilderОfUnmannedSystems";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -32,7 +32,7 @@
 		486107222EC6A2D7007F022B = {
 			isa = PBXGroup;
 			children = (
-				4861072D2EC6A2D7007F022B /* Calculator */,
+				4861072D2EC6A2D7007F022B /* BuilderОfUnmannedSystems */,
 				4861072C2EC6A2D7007F022B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,7 +61,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				4861072D2EC6A2D7007F022B /* Calculator */,
+				4861072D2EC6A2D7007F022B /* BuilderОfUnmannedSystems */,
 			);
 			name = Calculator;
 			packageProductDependencies = (
@@ -85,7 +85,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 486107262EC6A2D7007F022B /* Build configuration list for PBXProject "Calculator" */;
+			buildConfigurationList = 486107262EC6A2D7007F022B /* Build configuration list for PBXProject "BuilderОfUnmannedSystems" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -312,7 +312,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		486107262EC6A2D7007F022B /* Build configuration list for PBXProject "Calculator" */ = {
+		486107262EC6A2D7007F022B /* Build configuration list for PBXProject "BuilderОfUnmannedSystems" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				486107342EC6A2D8007F022B /* Debug */,
